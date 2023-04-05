@@ -55,7 +55,7 @@ function App() {
           {exercise.instruction && <p>Instruction : {exercise.instruction}</p>}
           <p>Niveau : {exercise.levels}</p>
           <p>Is Signle Step : {exercise.isSingleStep ? "oui" : "non"}</p>
-          <MathInput />
+
           {questions.map((question, index) => (
             <div key={index} className="border-white  bg-gray-500">
               {question.instruction && <p>{question.instruction}</p>}
