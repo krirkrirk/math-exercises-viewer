@@ -3,7 +3,7 @@ import reactLogo from "./assets/react.svg";
 import "./App.css";
 import { Exercise, Question } from "./types";
 import { MathComponent } from "mathjax-react";
-
+import MathInput from "react-math-keyboard";
 function App() {
   const [count, setCount] = useState(0);
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
@@ -37,6 +37,7 @@ function App() {
 
   return (
     <div className="App">
+      <MathInput numericToolbarKeys={["x", "y"]} />
       {!!allExercises.length && (
         <select onChange={(e) => onChange(e)}>
           {allExercises.map((exo) => (
@@ -54,11 +55,17 @@ function App() {
           {exercise.instruction && <p>Instruction : {exercise.instruction}</p>}
           <p>Niveau : {exercise.levels}</p>
           <p>Is Signle Step : {exercise.isSingleStep ? "oui" : "non"}</p>
+          <MathInput />
           {questions.map((question, index) => (
             <div key={index} className="border-white  bg-gray-500">
               {question.instruction && <p>{question.instruction}</p>}
               <p>Départ :</p>
               {question.startStatement && <MathComponent tex={question.startStatement} />}
+              <p>Clavier : </p>
+              {/* 
+              ajouter les clés définis par la question
+              <MathInput numericToolbarKeys={} />
+              */}
               <p>Réponse : </p>
               <MathComponent tex={question.answer} />
             </div>
