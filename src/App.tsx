@@ -40,6 +40,13 @@ function App() {
   return (
     <div className="App">
       <MathInput numericToolbarKeys={["x", "y"]} />
+      <MarkdownParser>
+        {`
+| foo | bar |
+| --- | --- |
+| baz | bim |
+`}
+      </MarkdownParser>
       {!!allExercises.length && (
         <select onChange={(e) => onChange(e)} defaultValue="">
           <option disabled selected value="">
