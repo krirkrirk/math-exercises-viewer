@@ -4,6 +4,8 @@ import "./App.css";
 import { Exercise, Question } from "./types";
 import { MathComponent } from "mathjax-react";
 import MarkdownParser from "./markdownParser";
+import MathInput from "react-math-keyboard";
+import { QuestionDisplay } from "./questionDisplay";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -19,7 +21,7 @@ function App() {
   useEffect(() => {
     const url = new URL(window.location.href);
     const exoId = url.searchParams.get("exoId");
-
+    const a = 2;
     if (exoId) {
       fetch(`http://localhost:5000/exo?exoId=${exoId}`)
         .then((res) => res.json())
@@ -56,6 +58,8 @@ function App() {
           <MarkdownParser>{selectedExercise.label}</MarkdownParser>
           <p>Section : {selectedExercise.section}</p>
           <p>Connecteur : {selectedExercise.connector}</p>
+          <p>Clavier : </p>
+          <MathInput numericToolbarKeys={[]} />
           {selectedExercise.instruction && (
             <p>
               Instruction :
@@ -68,17 +72,7 @@ function App() {
             Is Signle Step : {selectedExercise.isSingleStep ? "oui" : "non"}
           </p>
           {questions.map((question, index) => (
-            <div key={index} className="border-white  bg-gray-500">
-              {question.instruction && (
-                <MarkdownParser>{question.instruction}</MarkdownParser>
-              )}
-              <p>Départ :</p>
-              {question.startStatement && (
-                <MathComponent tex={question.startStatement} />
-              )}
-              <p>Réponse : </p>
-              <MathComponent tex={question.answer} />
-            </div>
+            <QuestionDisplay question={question} key={index} index={index} />
           ))}
         </div>
       )}
