@@ -3,6 +3,7 @@ import reactLogo from "./assets/react.svg";
 import "./App.css";
 import { Exercise, Question } from "./types";
 import { MathComponent } from "mathjax-react";
+import MathInput from "react-math-keyboard";
 import MarkdownParser from "./markdownParser";
 import MathInput from "react-math-keyboard";
 import { QuestionDisplay } from "./questionDisplay";
@@ -40,6 +41,14 @@ function App() {
 
   return (
     <div className="App">
+      <MathInput numericToolbarKeys={["x", "y"]} />
+      <MarkdownParser>
+        {`
+| foo | bar |
+| --- | --- |
+| baz | bim |
+`}
+      </MarkdownParser>
       {!!allExercises.length && (
         <select onChange={(e) => onChange(e)} defaultValue="">
           <option disabled selected value="">
