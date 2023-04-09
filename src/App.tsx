@@ -5,7 +5,6 @@ import { Exercise, Question } from "./types";
 import { MathComponent } from "mathjax-react";
 import MathInput from "react-math-keyboard";
 import MarkdownParser from "./markdownParser";
-import MathInput from "react-math-keyboard";
 import { QuestionDisplay } from "./questionDisplay";
 
 function App() {
@@ -41,7 +40,6 @@ function App() {
 
   return (
     <div className="App">
-      <MathInput numericToolbarKeys={["x", "y"]} />
       <MarkdownParser>
         {`
 | foo | bar |
