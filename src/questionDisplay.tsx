@@ -35,15 +35,19 @@ export const QuestionDisplay = ({ question, index }: Props) => {
 
   return (
     <div className="border-white  bg-gray-500">
-      {question.instruction && <MarkdownParser>{question.instruction}</MarkdownParser>}
+      {question.instruction && (
+        <MarkdownParser>{question.instruction}</MarkdownParser>
+      )}
 
       <p>Départ :</p>
-      {question.startStatement && <MathComponent tex={question.startStatement} />}
+      {question.startStatement && (
+        <MathComponent tex={question.startStatement} />
+      )}
       <p>Réponse : </p>
       <MathComponent tex={question.answer} />
 
       <p>Clavier : </p>
-      <MathInput />
+      <MathInput numericToolbarKeys={question.keys} />
       <p>Geogebra : </p>
       <div id={`ggb-question-${index}`}></div>
     </div>
