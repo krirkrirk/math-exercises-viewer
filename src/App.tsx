@@ -40,6 +40,7 @@ function App() {
 
   return (
     <div className="App">
+      {/* Un exemple d'un tableau. Il n'y a pas les bordures, c'est normal, mais il devrait s'afficher sans les "|" */}
       <MarkdownParser>
         {`
 | foo | bar |
@@ -69,15 +70,12 @@ function App() {
           <MathInput numericToolbarKeys={[]} />
           {selectedExercise.instruction && (
             <p>
-              Instruction :
-              <MarkdownParser>{selectedExercise.instruction}</MarkdownParser>
+              Instruction :<MarkdownParser>{selectedExercise.instruction}</MarkdownParser>
             </p>
           )}
 
           <p>Niveau : {selectedExercise.levels}</p>
-          <p>
-            Is Signle Step : {selectedExercise.isSingleStep ? "oui" : "non"}
-          </p>
+          <p>Is Signle Step : {selectedExercise.isSingleStep ? "oui" : "non"}</p>
           {questions.map((question, index) => (
             <QuestionDisplay question={question} key={index} index={index} />
           ))}

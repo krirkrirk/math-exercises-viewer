@@ -11,6 +11,9 @@ type Props = {
 
 export const QuestionDisplay = ({ question, index }: Props) => {
   const appletOnLoad = (app: any) => {
+    /**
+     * Ecrire ici les instructions à Geogebra
+     */
     app.evalCommand(`A=(${index},0)`);
   };
 
@@ -27,22 +30,15 @@ export const QuestionDisplay = ({ question, index }: Props) => {
       appletOnLoad: appletOnLoad,
     };
     var applet = new window.GGBApplet(params, true);
-    // window.addEventListener("load", function () {
     applet.inject(`ggb-question-${index}`);
-    // applet.evalCommand(`A=(${index};3)`);
-    // });1
   }, []);
 
   return (
     <div className="border-white  bg-gray-500">
-      {question.instruction && (
-        <MarkdownParser>{question.instruction}</MarkdownParser>
-      )}
+      {question.instruction && <MarkdownParser>{question.instruction}</MarkdownParser>}
 
       <p>Départ :</p>
-      {question.startStatement && (
-        <MathComponent tex={question.startStatement} />
-      )}
+      {question.startStatement && <MathComponent tex={question.startStatement} />}
       <p>Réponse : </p>
       <MathComponent tex={question.answer} />
 
