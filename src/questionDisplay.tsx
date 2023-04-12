@@ -14,7 +14,15 @@ export const QuestionDisplay = ({ question, index }: Props) => {
     /**
      * Ecrire ici les instructions à Geogebra
      */
-    app.evalCommand(`A=(${index},0)`);
+    if (!question.commands?.length) return;
+    question.commands.forEach((command) => app.evalCommand(command));
+    if (!question.coords?.length) return;
+    app.setCoordSystem(
+      question.coords[0],
+      question.coords[1],
+      question.coords[2],
+      question.coords[3]
+    );
   };
 
   useEffect(() => {
@@ -31,7 +39,7 @@ export const QuestionDisplay = ({ question, index }: Props) => {
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
-  }, []);
+  }, [index, question]);
 
   return (
     <div className="border-white  bg-gray-500">
