@@ -17,11 +17,10 @@ function App() {
     // setSelectedExercise(allExercises.find((exo) => exo.id === e.target.value));
     window.location.href = `/exo?exoId=${e.target.value}`;
   };
-
+  console.log(allExercises);
   useEffect(() => {
     const url = new URL(window.location.href);
     const exoId = url.searchParams.get("exoId");
-    const a = 2;
     if (exoId) {
       fetch(`http://localhost:5000/exo?exoId=${exoId}`)
         .then((res) => res.json())

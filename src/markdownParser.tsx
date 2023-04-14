@@ -10,7 +10,16 @@ type Props = {
 
 export default function MarkdownParser({ children }: Props) {
   return (
-    <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]} className="markdown">
+    <ReactMarkdown
+      remarkPlugins={[remarkMath, remarkGfm]}
+      rehypePlugins={[rehypeKatex]}
+      className="markdown"
+      components={{
+        table: ({ node, ...props }) => <table style={{ border: "1px solid" }} {...props} />,
+        tr: ({ node, ...props }) => <tr style={{ border: "1px solid" }} {...props} />,
+        td: ({ node, ...props }) => <td style={{ border: "1px solid", padding: "10px" }} {...props} />,
+      }}
+    >
       {children}
     </ReactMarkdown>
   );

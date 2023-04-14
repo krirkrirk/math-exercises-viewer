@@ -14,7 +14,7 @@ export const QuestionDisplay = ({ question, index }: Props) => {
     /**
      * Ecrire ici les instructions à Geogebra
      */
-    app.evalCommand(`A=(${index},0)`);
+    app.evalCommand(`(${question.answer}, ${question.answer})`);
   };
 
   useEffect(() => {
@@ -31,18 +31,14 @@ export const QuestionDisplay = ({ question, index }: Props) => {
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
-  }, []);
+  }, [index]);
 
   return (
     <div className="border-white  bg-gray-500">
-      {question.instruction && (
-        <MarkdownParser>{question.instruction}</MarkdownParser>
-      )}
+      {question.instruction && <MarkdownParser>{question.instruction}</MarkdownParser>}
 
       <p>Départ :</p>
-      {question.startStatement && (
-        <MathComponent tex={question.startStatement} />
-      )}
+      {question.startStatement && <MathComponent tex={question.startStatement} />}
       <p>Réponse : </p>
       <MathComponent tex={question.answer} />
 
