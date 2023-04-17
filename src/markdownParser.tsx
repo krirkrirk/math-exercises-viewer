@@ -15,7 +15,7 @@ export default function MarkdownParser({ children }: Props) {
       rehypePlugins={[rehypeKatex]}
       className="markdown"
       components={{
-        table: ({ node, ...props }) => <table style={{ border: "1px solid" }} {...props} />,
+        table: ({ node, ...props }) => <table style={{ border: "1px solid", margin: "auto" }} {...props} />,
         tr: ({ node, ...props }) => <tr style={{ border: "1px solid" }} {...props} />,
         td: ({ node, ...props }) => <td style={{ border: "1px solid", padding: "10px" }} {...props} />,
       }}

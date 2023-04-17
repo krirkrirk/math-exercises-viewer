@@ -31,6 +31,7 @@ export const QuestionDisplay = ({ question, index }: Props) => {
       showAlgebraInput: false,
       showMenuBar: false,
       appletOnLoad: appletOnLoad,
+      filename: "/geogebra-default-app.ggb",
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
