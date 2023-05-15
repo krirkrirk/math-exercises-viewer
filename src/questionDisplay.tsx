@@ -17,7 +17,12 @@ export const QuestionDisplay = ({ question, index }: Props) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
-    app.setCoordSystem(question.coords[0], question.coords[1], question.coords[2], question.coords[3]);
+    app.setCoordSystem(
+      question.coords[0],
+      question.coords[1],
+      question.coords[2],
+      question.coords[3]
+    );
   };
 
   useEffect(() => {
@@ -31,7 +36,7 @@ export const QuestionDisplay = ({ question, index }: Props) => {
       showAlgebraInput: false,
       showMenuBar: false,
       appletOnLoad: appletOnLoad,
-      filename: "/geogebra-default-app.ggb",
+      filename: "/geogebra-default-ortho.ggb",
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
@@ -39,10 +44,14 @@ export const QuestionDisplay = ({ question, index }: Props) => {
 
   return (
     <div className="border-white  bg-gray-500">
-      {question.instruction && <MarkdownParser>{question.instruction}</MarkdownParser>}
+      {question.instruction && (
+        <MarkdownParser>{question.instruction}</MarkdownParser>
+      )}
 
       <p>Départ :</p>
-      {question.startStatement && <MathComponent tex={question.startStatement} />}
+      {question.startStatement && (
+        <MathComponent tex={question.startStatement} />
+      )}
       <p>Réponse : </p>
       <MathComponent tex={question.answer} />
 
