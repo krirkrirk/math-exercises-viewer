@@ -1,34 +1,43 @@
 import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
 import "./App.css";
 import { Exercise, Question } from "./types";
-import { MathComponent } from "mathjax-react";
 import MathInput from "react-math-keyboard";
 import MarkdownParser from "./markdownParser";
 import { QuestionDisplay } from "./questionDisplay";
+import { GeneratorsList } from "./generatorsList";
 
 function App() {
-  const [count, setCount] = useState(0);
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<Exercise>();
   const [questions, setQuestions] = useState<Question[]>([]);
-
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     // setSelectedExercise(allExercises.find((exo) => exo.id === e.target.value));
     window.location.href = `/exo?exoId=${e.target.value}`;
   };
-  console.log(allExercises);
+
   useEffect(() => {
     const url = new URL(window.location.href);
     const exoId = url.searchParams.get("exoId");
+    const isQCM = url.searchParams.get("isQCM");
+    console.log(isQCM === "true");
     if (exoId) {
-      fetch(`http://localhost:5000/exo?exoId=${exoId}`)
-        .then((res) => res.json())
-        .then((res) => {
-          setSelectedExercise(res.exercise);
-          setQuestions(res.questions);
-        })
-        .catch((err) => console.log(err));
+      if (isQCM === "true") {
+        fetch(`http://localhost:5000/qcmExo?exoId=${exoId}`)
+          .then((res) => res.json())
+          .then((res) => {
+            setSelectedExercise(res.exercise);
+            setQuestions(res.questions);
+          })
+          .catch((err) => console.log(err));
+      } else {
+        fetch(`http://localhost:5000/exo?exoId=${exoId}`)
+          .then((res) => res.json())
+          .then((res) => {
+            setSelectedExercise(res.exercise);
+            setQuestions(res.questions);
+          })
+          .catch((err) => console.log(err));
+      }
     } else {
       fetch("http://localhost:5000")
         .then((res) => res.json())
@@ -38,30 +47,25 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      {/* Un exemple d'un tableau. Il n'y a pas les bordures, c'est normal, mais il devrait s'afficher sans les "|" */}
-      <MarkdownParser>
-        {`
-| foo | bar |
-| --- | --- |
-| baz | bim |
-`}
-      </MarkdownParser>
+    <div className="App" style={{ width: "90vw", padding: "50px" }}>
       {!!allExercises.length && (
-        <select onChange={(e) => onChange(e)} defaultValue="">
-          <option disabled selected value="">
-            {" "}
-            -- select an option --{" "}
-          </option>
-          {allExercises.map((exercise) => (
-            <option value={exercise.id} key={exercise.id}>
-              {exercise.label}
+        <>
+          <select onChange={(e) => onChange(e)} defaultValue="">
+            <option disabled selected value="">
+              {" "}
+              -- select an option --{" "}
             </option>
-          ))}
-        </select>
+            {allExercises.map((exercise) => (
+              <option value={exercise.id} key={exercise.id}>
+                {exercise.label}
+              </option>
+            ))}
+          </select>
+          <GeneratorsList allExercises={allExercises} />
+        </>
       )}
       {selectedExercise?.id && (
-        <div>
+        <div style={{ width: "100%" }}>
           <MarkdownParser>{selectedExercise.label}</MarkdownParser>
           <p>Section : {selectedExercise.section}</p>
           <p>Connecteur : {selectedExercise.connector}</p>

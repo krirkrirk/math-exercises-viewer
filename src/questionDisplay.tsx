@@ -19,7 +19,7 @@ export const QuestionDisplay = ({ question, index }: Props) => {
     if (!question.coords?.length) return;
     app.setCoordSystem(question.coords[0], question.coords[1], question.coords[2], question.coords[3]);
   };
-
+  console.log(question);
   useEffect(() => {
     var params = {
       id: `question${index}`,
@@ -45,11 +45,18 @@ export const QuestionDisplay = ({ question, index }: Props) => {
       {question.startStatement && <MathComponent tex={question.startStatement} />}
       <p>Réponse : </p>
       <MathComponent tex={question.answer} />
-
+      <p>Propositions : </p>
+      {question?.propositions?.map((prop) => (
+        <p key={prop.id}>{prop.statement}</p>
+      ))}
       <p>Clavier : </p>
       <MathInput numericToolbarKeys={question.keys} />
-      <p>Geogebra : </p>
-      <div id={`ggb-question-${index}`}></div>
+      {question.coords?.length && (
+        <>
+          <p>Geogebra : </p>
+          <div id={`ggb-question-${index}`}></div>
+        </>
+      )}
     </div>
   );
 };

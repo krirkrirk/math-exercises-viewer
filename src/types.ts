@@ -1,3 +1,9 @@
+export type Proposition = {
+  id: string;
+  statement: string;
+  isRightAnswer: boolean;
+};
+
 export interface Question {
   instruction?: string;
   startStatement?: string;
@@ -5,6 +11,7 @@ export interface Question {
   keys?: string[];
   commands?: string[];
   coords?: number[];
+  propositions?: Proposition[];
 }
 
 export interface Exercise {
