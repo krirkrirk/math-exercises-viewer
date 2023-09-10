@@ -1,35 +1,54 @@
-import { useEffect, useRef, useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { Exercise, Question } from "./types";
-import { MathComponent } from "mathjax-react";
 import MathInput from "react-math-keyboard";
 import MarkdownParser from "./markdownParser";
 import { QuestionDisplay } from "./questionDisplay";
-import { Configuration, OpenAIApi } from "openai";
+import { GeneratorsList } from "./generatorsList";
+import { GeneratorsListByLevel } from "./generatorsListByLevel";
+import { GeneratorsListBySection } from "./generatorsListBySection";
 
 function App() {
-  const [count, setCount] = useState(0);
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<Exercise>();
   const [questions, setQuestions] = useState<Question[]>([]);
-
-  const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const [prevExoId, setPrevExoId] = useState("");
+  const [nextExoId, setNextExoId] = useState("");
+  const onSelect = (exoId: string) => {
     // setSelectedExercise(allExercises.find((exo) => exo.id === e.target.value));
-    window.location.href = `/exo?exoId=${e.target.value}`;
+    window.location.href = `/exo?exoId=${exoId}`;
   };
-  console.log(allExercises);
+
+  const [isQCM, setIsQCM] = useState(false);
+
   useEffect(() => {
     const url = new URL(window.location.href);
     const exoId = url.searchParams.get("exoId");
+    const qcm = url.searchParams.get("isQCM");
+    setIsQCM(qcm === "true");
     if (exoId) {
-      fetch(`http://localhost:5000/exo?exoId=${exoId}`)
-        .then((res) => res.json())
-        .then((res) => {
-          setSelectedExercise(res.exercise);
-          setQuestions(res.questions);
-        })
-        .catch((err) => console.log(err));
+      if (qcm === "true") {
+        fetch(`http://localhost:5000/qcmExo?exoId=${exoId}`)
+          .then((res) => res.json())
+          .then((res) => {
+            setSelectedExercise(res.exercise);
+            setQuestions(res.questions);
+            setNextExoId(res.nextId);
+            setPrevExoId(res.prevId);
+          })
+          .catch((err) => console.log(err));
+      } else {
+        fetch(`http://localhost:5000/exo?exoId=${exoId}`)
+          .then((res) => res.json())
+          .then((res) => {
+            setSelectedExercise(res.exercise);
+            setQuestions(res.questions);
+
+            setNextExoId(res.nextId);
+            setPrevExoId(res.prevId);
+          })
+          .catch((err) => console.log(err));
+      }
     } else {
       fetch("http://localhost:5000")
         .then((res) => res.json())
@@ -38,96 +57,101 @@ function App() {
     }
   }, []);
 
-  /*const chatGPT = async () => {
-    const configuration = new Configuration({
-      apiKey: "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", // Idéalement, vous aurez mis votre clé api dans l'env
-    });
-    const openai = new OpenAIApi(configuration);
+  const [displayType, setDisplayType] = useState<
+    "all" | "byLevel" | "bySection"
+  >("all");
 
-    const prompt = `
-    Pour un QCM je veux uniquemnt 4 propositions concernant la question suivante : 
-    instruction : ${selectedExercise?.instruction || questions[0].instruction} 
-    startStamenent : ${questions[0]?.startStatement}
-    et la réponse à cette question : ${questions[0].answer}.
-    Les 4 propositions doivent etre séparés par des points virgules et sans énumérations. j'insiste sur ces deux remarques !!`;
-
-    const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
-
-    console.log(prompt);
-    console.log(completion.data.choices[0].message?.content);
-
-    const str = completion.data.choices[0].message?.content ?? "";
-    const mots: string[] = str.split(";");
-    console.log(mots);
+  const onNext = () => {
+    if (!nextExoId) return;
+    onSelect(nextExoId);
   };
 
-  const timeout = useRef<any>();
-
-  const debounce = (func: any) => {
-    const later = () => {
-      clearTimeout(timeout.current);
-      func();
-    };
-
-    if (timeout.current) clearTimeout(timeout.current);
-    timeout.current = setTimeout(later, 1000);
+  const onPrev = () => {
+    if (!prevExoId) return;
+    onSelect(prevExoId);
   };
-
-  useEffect(() => {
-    debounce(chatGPT);
-  }, [questions]);
-*/
   return (
-    <div className="App">
-      {/* Un exemple d'un tableau. Il n'y a pas les bordures, c'est normal, mais il devrait s'afficher sans les "|" */}
-      <MarkdownParser>
-        {`
-| foo | bar |
-| --- | --- |
-| baz | bim |
-`}
-      </MarkdownParser>
+    <div className="App" style={{ width: "90vw", padding: "50px" }}>
       {!!allExercises.length && (
-        <select onChange={(e) => onChange(e)} defaultValue="">
-          <option disabled selected value="">
-            {" "}
-            -- select an option --{" "}
-          </option>
-          {allExercises.map((exercise) => (
-            <option value={exercise.id} key={exercise.id}>
-              {exercise.label}
-            </option>
-          ))}
-        </select>
+        <div>
+          <div>
+            <button onClick={(e) => setDisplayType("all")}>Tous</button>
+            <button onClick={(e) => setDisplayType("byLevel")}>Niveaux</button>
+            <button onClick={(e) => setDisplayType("bySection")}>
+              Sections
+            </button>
+          </div>
+          {displayType === "all" && (
+            <GeneratorsList allExercises={allExercises} onSelect={onSelect} />
+          )}
+          {displayType === "byLevel" && (
+            <GeneratorsListByLevel allExercises={allExercises} />
+          )}
+          {displayType === "bySection" && (
+            <GeneratorsListBySection allExercises={allExercises} />
+          )}
+        </div>
       )}
       {selectedExercise?.id && (
-        <div>
-          <MarkdownParser>{selectedExercise.label}</MarkdownParser>
-          <p>Section : {selectedExercise.section}</p>
+        <div style={{ width: "100%" }}>
+          {!isQCM && (
+            <button
+              onClick={(e) =>
+                (window.location.href = window.location.href + "&isQCM=true")
+              }
+              className="border-2 p-3"
+            >
+              Version QCM
+            </button>
+          )}
+          {isQCM && (
+            <button
+              onClick={(e) =>
+                (window.location.href = window.location.href.replace(
+                  "&isQCM=true",
+                  ""
+                ))
+              }
+              className="border-2 p-3"
+            >
+              Version Free
+            </button>
+          )}
+
+          <button onClick={(e) => onPrev()} className="border-2 p-3">
+            Prev Generator
+          </button>
+          <button onClick={(e) => onNext()} className="border-2 p-3">
+            Next Generator
+          </button>
+          <span className="flex p-3">
+            <p className="mr-3 text-2xl">
+              {selectedExercise.sections.join(", ")} {">>"}
+            </p>
+            <MarkdownParser>{selectedExercise.label}</MarkdownParser>
+          </span>
           <p>Connecteur : {selectedExercise.connector}</p>
-          <p>Clavier : </p>
-          <MathInput numericToolbarKeys={[]} />
+
+          <p>Niveaux : {selectedExercise.levels.join(", ")}</p>
+          <p>
+            {selectedExercise.isSingleStep
+              ? "En une étape"
+              : "Plusieurs étapes"}
+          </p>
           {selectedExercise.instruction && (
-            <p>
-              Instruction :
+            <p className="mt-5 mx-20">
               <MarkdownParser>{selectedExercise.instruction}</MarkdownParser>
             </p>
           )}
 
-          <p>Niveau : {selectedExercise.levels}</p>
-          <p>
-            Is Signle Step : {selectedExercise.isSingleStep ? "oui" : "non"}
-          </p>
           {questions.map((question, index) => (
-            <QuestionDisplay question={question} key={index} index={index} />
+            <QuestionDisplay
+              exo={selectedExercise}
+              question={question}
+              key={index}
+              index={index}
+              isQCM={isQCM}
+            />
           ))}
         </div>
       )}

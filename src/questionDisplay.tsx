@@ -1,15 +1,18 @@
 import { MathComponent } from "mathjax-react";
 import MarkdownParser from "./markdownParser";
-import { Question } from "./types";
+import { Exercise, Question } from "./types";
 import { useEffect } from "react";
 import MathInput from "react-math-keyboard";
+import { AnswerDisplay } from "./answerDisplay";
 
 type Props = {
+  exo: Exercise;
   question: Question;
   index: number;
+  isQCM: boolean;
 };
 
-export const QuestionDisplay = ({ question, index }: Props) => {
+export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
   const appletOnLoad = (app: any) => {
     /**
      * Ecrire ici les instructions à Geogebra
@@ -24,7 +27,7 @@ export const QuestionDisplay = ({ question, index }: Props) => {
       question.coords[3]
     );
   };
-
+  console.log(question);
   useEffect(() => {
     var params = {
       id: `question${index}`,
@@ -43,22 +46,41 @@ export const QuestionDisplay = ({ question, index }: Props) => {
   }, [index, question]);
 
   return (
-    <div className="border-white  bg-gray-500">
+    <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
         <MarkdownParser>{question.instruction}</MarkdownParser>
       )}
-
-      <p>Départ :</p>
       {question.startStatement && (
-        <MathComponent tex={question.startStatement} />
+        <MathComponent tex={`${question.startStatement} ${exo.connector!} ?`} />
       )}
-      <p>Réponse : </p>
-      <MathComponent tex={question.answer} />
-
-      <p>Clavier : </p>
-      <MathInput numericToolbarKeys={question.keys} />
-      <p>Geogebra : </p>
-      <div id={`ggb-question-${index}`}></div>
+      {question.commands?.length && (
+        <>
+          <div id={`ggb-question-${index}`}></div>
+        </>
+      )}
+      <p>Réponse attendue : </p>
+      <AnswerDisplay
+        answer={question.answer}
+        answerFormat={question.answerFormat ?? "tex"}
+      />
+      {question?.propositions && (
+        <>
+          <p>Propositions : </p>
+          {question?.propositions?.map((prop) => (
+            <AnswerDisplay
+              key={prop.id}
+              answer={prop.statement}
+              answerFormat={prop.format ?? "tex"}
+            />
+          ))}
+        </>
+      )}
+      {!isQCM && (
+        <>
+          <p>Clavier : </p>
+          <MathInput numericToolbarKeys={question.keys} />
+        </>
+      )}
     </div>
   );
 };
