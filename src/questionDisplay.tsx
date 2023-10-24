@@ -1,7 +1,7 @@
 import { MathComponent } from "mathjax-react";
 import MarkdownParser from "./markdownParser";
 import { Exercise, Question } from "./types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import MathInput from "react-math-keyboard";
 import { AnswerDisplay } from "./answerDisplay";
 
@@ -20,12 +20,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
-    app.setCoordSystem(
-      question.coords[0],
-      question.coords[1],
-      question.coords[2],
-      question.coords[3]
-    );
+    app.setCoordSystem(question.coords[0], question.coords[1], question.coords[2], question.coords[3]);
   };
   console.log(question);
   useEffect(() => {
@@ -45,40 +40,34 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     applet.inject(`ggb-question-${index}`);
   }, [index, question]);
 
+  const [latex, setLatex] = useState("");
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
-      {question.instruction && (
-        <MarkdownParser>{question.instruction}</MarkdownParser>
-      )}
-      {question.startStatement && (
-        <MathComponent tex={`${question.startStatement} ${exo.connector!} ?`} />
-      )}
+      {question.instruction && <MarkdownParser>{question.instruction}</MarkdownParser>}
+      {question.startStatement && <MathComponent tex={`${question.startStatement} ${exo.connector!} ?`} />}
       {question.commands?.length && (
         <>
           <div id={`ggb-question-${index}`}></div>
         </>
       )}
       <p>Réponse attendue : </p>
-      <AnswerDisplay
-        answer={question.answer}
-        answerFormat={question.answerFormat ?? "tex"}
-      />
+      <AnswerDisplay answer={question.answer} answerFormat={question.answerFormat ?? "tex"} />
+      <p>Latex :</p>
+      <p>{question.answer}</p>
       {question?.propositions && (
         <>
           <p>Propositions : </p>
           {question?.propositions?.map((prop) => (
-            <AnswerDisplay
-              key={prop.id}
-              answer={prop.statement}
-              answerFormat={prop.format ?? "tex"}
-            />
+            <AnswerDisplay key={prop.id} answer={prop.statement} answerFormat={prop.format ?? "tex"} />
           ))}
         </>
       )}
       {!isQCM && (
         <>
           <p>Clavier : </p>
-          <MathInput numericToolbarKeys={question.keys} />
+          <MathInput numericToolbarKeys={question.keys} setValue={setLatex} />
+          <p>Latex :</p>
+          <p>{latex}</p>
         </>
       )}
     </div>
