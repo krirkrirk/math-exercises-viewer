@@ -1,17 +1,15 @@
 import { MathComponent } from "mathjax-react";
 import MarkdownParser from "./markdownParser";
 import { Exercise, Question } from "./types";
-import { useEffect } from "react";
-import MathInput from "react-math-keyboard";
+import { useEffect, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
-
+import MathInput from "react-math-keyboard";
 type Props = {
   exo: Exercise;
   question: Question;
   index: number;
   isQCM: boolean;
 };
-
 export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
   const appletOnLoad = (app: any) => {
     /**
@@ -45,6 +43,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     applet.inject(`ggb-question-${index}`);
   }, [index, question]);
 
+  const [latex, setLatex] = useState("");
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
@@ -63,6 +62,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         answer={question.answer}
         answerFormat={question.answerFormat ?? "tex"}
       />
+      <p>latex: {question.answer}</p>
       {question?.propositions && (
         <>
           <p>Propositions : </p>
@@ -78,9 +78,18 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       {!isQCM && (
         <>
           <p>Clavier : </p>
-          <MathInput numericToolbarKeys={question.keys} />
+          <MathInput numericToolbarKeys={question.keys} setValue={setLatex} />
+          <p>
+            bonne réponse :{" "}
+            {formatLatex(latex) === question.answer ? "OUI" : "NON"}
+          </p>
+          <p>latex: {latex}</p>
         </>
       )}
     </div>
   );
+};
+
+const formatLatex = (s: string) => {
+  return s.replaceAll("\\varnothing", "\\emptyset");
 };
