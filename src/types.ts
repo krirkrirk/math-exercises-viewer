@@ -12,8 +12,8 @@ export type Proposition = {
   isRightAnswer: boolean;
   format: "tex" | "raw";
 };
-export interface Question {
-  instruction?: string;
+export interface Question<TQCMProps = any, TVEAProps = any> {
+  instruction: string;
   startStatement?: string;
   answer: string;
   answerFormat?: "tex" | "raw";
@@ -23,9 +23,14 @@ export interface Question {
   options?: any;
   propositions?: Proposition[];
   getPropositions?: (n: number) => Proposition[];
+  qcmGeneratorProps?: TQCMProps;
+  veaProps?: TVEAProps;
 }
 
-export interface Exercise {
+export type QCMGenerator<T> = (n: number, args: T) => Proposition[];
+export type VEA<T> = (studentAnswer: string, args: T) => boolean;
+export type QuestionGenerator<TQCMProps = any, TVEAProps = any> = () => Question<TQCMProps, TVEAProps>;
+export interface Exercise<TQCMProps = any, TVEAProps = any> {
   id: string;
   instruction: string;
   isSingleStep: boolean;
@@ -34,7 +39,9 @@ export interface Exercise {
   levels: Level[];
   connector: "=" | "\\iff" | "\\approx";
   keys?: string[];
-  generator(nb: number, options?: GeneratorOptions): Question[];
+  generator: (n: number) => Question<TQCMProps, TVEAProps>[];
+  getPropositions?: QCMGenerator<TQCMProps>;
+  isAnswerValid?: VEA<TVEAProps>;
 }
 
 export type Level =

@@ -4,6 +4,7 @@ import { Exercise, Question } from "./types";
 import { useEffect, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
+
 type Props = {
   exo: Exercise;
   question: Question;
@@ -20,7 +21,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     if (!question.coords?.length) return;
     app.setCoordSystem(question.coords[0], question.coords[1], question.coords[2], question.coords[3]);
   };
-  console.log(question);
+
   useEffect(() => {
     var params = {
       id: `question${index}`,
@@ -39,6 +40,29 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
   }, [index, question]);
 
   const [latex, setLatex] = useState("");
+  const [veaResult, setVeaResult] = useState<boolean>();
+  useEffect(() => {
+    setVeaResult(undefined);
+  }, [latex]);
+  const vea = (input: string) => {
+    fetch(`http://localhost:5000/vea?exoId=${exo.id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        ans: input,
+        veaProps: question.veaProps,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setVeaResult(res.result);
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && <MarkdownParser>{question.instruction}</MarkdownParser>}
@@ -49,10 +73,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         </>
       )}
       <p>Réponse attendue : </p>
-      <AnswerDisplay
-        answer={question.answer}
-        answerFormat={question.answerFormat ?? "tex"}
-      />
+      <AnswerDisplay answer={question.answer} answerFormat={question.answerFormat ?? "tex"} />
       <p>latex: {question.answer}</p>
       {question?.propositions && (
         <>
@@ -66,10 +87,13 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         <>
           <p>Clavier : </p>
           <MathInput numericToolbarKeys={question.keys} setValue={setLatex} />
-          <p>
-            bonne réponse :{" "}
-            {formatLatex(latex) === question.answer ? "OUI" : "NON"}
-          </p>
+          <p>bonne réponse officielle : {formatLatex(latex) === question.answer ? "OUI" : "NON"}</p>
+          <div className="mx-3">
+            <button onClick={() => vea(latex)} className="border mx-3">
+              check vea
+            </button>
+            {veaResult !== undefined && <span>{veaResult ? "OK!" : "Non"}</span>}
+          </div>
           <p>latex: {latex}</p>
         </>
       )}
