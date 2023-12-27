@@ -4,6 +4,8 @@
 //   implies = "\\Rightarrow",
 // }
 
+import { KeyId } from "./keyIds";
+
 export type GeneratorOptions = {};
 
 export type Proposition = {
@@ -12,36 +14,45 @@ export type Proposition = {
   isRightAnswer: boolean;
   format: "tex" | "raw";
 };
-export interface Question<TQCMProps = any, TVEAProps = any> {
+
+export interface Question<TIdentifiers = {}> {
   instruction: string;
   startStatement?: string;
   answer: string;
-  answerFormat?: "tex" | "raw";
-  keys?: string[];
+  answerFormat: "tex" | "raw";
+  keys?: KeyId[];
   commands?: string[];
   coords?: number[];
   options?: any;
-  propositions?: Proposition[];
-  getPropositions?: (n: number) => Proposition[];
-  qcmGeneratorProps?: TQCMProps;
-  veaProps?: TVEAProps;
+  divisionFormat?: "fraction" | "obelus";
+  identifiers: TIdentifiers;
 }
 
-export type QCMGenerator<T> = (n: number, args: T) => Proposition[];
-export type VEA<T> = (studentAnswer: string, args: T) => boolean;
-export type QuestionGenerator<TQCMProps = any, TVEAProps = any> = () => Question<TQCMProps, TVEAProps>;
-export interface Exercise<TQCMProps = any, TVEAProps = any> {
+export type QCMGenerator<TIdentifiers> = (
+  n: number,
+  args: { answer: string } & TIdentifiers
+) => Proposition[];
+export type VEA<TIdentifiers> = (
+  studentAnswer: string,
+  args: { answer: string } & TIdentifiers
+) => boolean;
+export type QuestionGenerator<TIdentifiers = {}, TOptions = {}> = (
+  opts?: TOptions
+) => Question<TIdentifiers>;
+export interface Exercise<TIdentifiers = {}> {
   id: string;
-  instruction: string;
   isSingleStep: boolean;
   label: string;
   sections: Section[];
   levels: Level[];
-  connector: "=" | "\\iff" | "\\approx";
-  keys?: string[];
-  generator: (n: number) => Question<TQCMProps, TVEAProps>[];
-  getPropositions?: QCMGenerator<TQCMProps>;
-  isAnswerValid?: VEA<TVEAProps>;
+  connector?: "=" | "\\iff" | "\\approx";
+  generator: (n: number) => Question<TIdentifiers>[];
+  maxAllowedQuestions?: number;
+  answerType?: "QCM" | "free";
+  qcmTimer: number;
+  freeTimer: number;
+  getPropositions?: QCMGenerator<{ answer: string } & TIdentifiers>;
+  isAnswerValid?: VEA<TIdentifiers>;
 }
 
 export type Level =

@@ -14,6 +14,7 @@ function App() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [prevExoId, setPrevExoId] = useState("");
   const [nextExoId, setNextExoId] = useState("");
+  const [exoCount, setExoCount] = useState(0);
   const onSelect = (exoId: string) => {
     // setSelectedExercise(allExercises.find((exo) => exo.id === e.target.value));
     window.location.href = `/exo?exoId=${exoId}`;
@@ -52,7 +53,10 @@ function App() {
     } else {
       fetch("http://localhost:5000")
         .then((res) => res.json())
-        .then((res) => setAllExercises(res))
+        .then((res) => {
+          setAllExercises(res);
+          setExoCount(res.length);
+        })
         .catch((err) => console.log(err));
     }
   }, []);
@@ -74,6 +78,7 @@ function App() {
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
       {!!allExercises.length && (
         <div>
+          <p>{exoCount} Générateurs</p>
           <div>
             <button onClick={(e) => setDisplayType("all")}>Tous</button>
             <button onClick={(e) => setDisplayType("byLevel")}>Niveaux</button>

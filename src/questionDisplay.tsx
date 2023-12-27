@@ -1,7 +1,7 @@
 import { MathComponent } from "mathjax-react";
 import MarkdownParser from "./markdownParser";
 import { Exercise, Question } from "./types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 
@@ -19,7 +19,12 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
-    app.setCoordSystem(question.coords[0], question.coords[1], question.coords[2], question.coords[3]);
+    app.setCoordSystem(
+      question.coords[0],
+      question.coords[1],
+      question.coords[2],
+      question.coords[3]
+    );
   };
 
   useEffect(() => {
@@ -53,7 +58,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       },
       body: JSON.stringify({
         ans: input,
-        veaProps: question.veaProps,
+        veaProps: { answer: question.answer, ...question.identifiers },
       }),
     })
       .then((res) => res.json())
@@ -63,36 +68,67 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       })
       .catch((err) => console.log(err));
   };
+
+  const mathfieldRef = useRef<any>();
+  const onCopyLatex = () => {
+    console.log(mathfieldRef.current);
+    mathfieldRef.current.latex(question.answer);
+  };
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
-      {question.instruction && <MarkdownParser>{question.instruction}</MarkdownParser>}
-      {question.startStatement && <MathComponent tex={`${question.startStatement} ${exo.connector!} ?`} />}
+      {question.instruction && (
+        <MarkdownParser>{question.instruction}</MarkdownParser>
+      )}
+      {question.startStatement && (
+        <MathComponent tex={`${question.startStatement} ${exo.connector!} ?`} />
+      )}
       {question.commands?.length && (
         <>
           <div id={`ggb-question-${index}`}></div>
         </>
       )}
       <p>Réponse attendue : </p>
-      <AnswerDisplay answer={question.answer} answerFormat={question.answerFormat ?? "tex"} />
-      <p>latex: {question.answer}</p>
+      <AnswerDisplay
+        answer={question.answer}
+        answerFormat={question.answerFormat ?? "tex"}
+      />
+      <div>
+        <span>latex: {question.answer}</span>
+        <button className="ml-3 border" onClick={onCopyLatex}>
+          Copy
+        </button>
+      </div>
       {question?.propositions && (
         <>
           <p>Propositions : </p>
           {question?.propositions?.map((prop) => (
-            <AnswerDisplay key={prop.id} answer={prop.statement} answerFormat={prop.format ?? "tex"} />
+            <AnswerDisplay
+              key={prop.id}
+              answer={prop.statement}
+              answerFormat={prop.format ?? "tex"}
+            />
           ))}
         </>
       )}
       {!isQCM && (
         <>
           <p>Clavier : </p>
-          <MathInput numericToolbarKeys={question.keys} setValue={setLatex} />
-          <p>bonne réponse officielle : {formatLatex(latex) === question.answer ? "OUI" : "NON"}</p>
+          <MathInput
+            numericToolbarKeys={question.keys}
+            setValue={setLatex}
+            setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
+          />
+          <p>
+            bonne réponse officielle :{" "}
+            {formatLatex(latex) === question.answer ? "OUI" : "NON"}
+          </p>
           <div className="mx-3">
             <button onClick={() => vea(latex)} className="border mx-3">
               check vea
             </button>
-            {veaResult !== undefined && <span>{veaResult ? "OK!" : "Non"}</span>}
+            {veaResult !== undefined && (
+              <span>{veaResult ? "OK!" : "Non"}</span>
+            )}
           </div>
           <p>latex: {latex}</p>
         </>
