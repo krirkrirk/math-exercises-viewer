@@ -26,6 +26,7 @@ export interface Question<TIdentifiers = {}> {
   options?: any;
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
+  propositions?: Proposition[];
 }
 
 export type QCMGenerator<TIdentifiers> = (

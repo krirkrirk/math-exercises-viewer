@@ -79,6 +79,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       {question.instruction && (
         <MarkdownParser>{question.instruction}</MarkdownParser>
       )}
+
       {question.startStatement && (
         <MathComponent tex={`${question.startStatement} ${exo.connector!} ?`} />
       )}
@@ -117,6 +118,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
             numericToolbarKeys={question.keys}
             setValue={setLatex}
             setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
+            forbidOtherKeyboardKeys={true}
           />
           <p>
             bonne réponse officielle :{" "}
