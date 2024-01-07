@@ -77,7 +77,7 @@ export const GeneratorsListByLevel = ({
                         : "",
                     }}
                   >
-                    <MarkdownParser>{generator.label}</MarkdownParser>
+                    <MarkdownParser text={generator.label}></MarkdownParser>
                   </div>
                 );
               })}

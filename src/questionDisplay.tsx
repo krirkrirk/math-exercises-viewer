@@ -74,10 +74,11 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     console.log(mathfieldRef.current);
     mathfieldRef.current.latex(question.answer);
   };
+  console.log(question.instruction);
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
-        <MarkdownParser>{question.instruction}</MarkdownParser>
+        <MarkdownParser text={question.instruction}></MarkdownParser>
       )}
 
       {question.startStatement && (

@@ -75,7 +75,7 @@ export const GeneratorsListBySection = ({
                         : "",
                     }}
                   >
-                    <MarkdownParser>{generator.label}</MarkdownParser>
+                    <MarkdownParser text={generator.label}></MarkdownParser>
                   </div>
                 );
               })}

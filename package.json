@@ -16,7 +16,7 @@
     "openai": "^3.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-markdown": "^8.0.6",
+    "react-markdown": "^8.0.7",
     "react-math-keyboard": "^1.5.5",
     "rehype-katex": "^6.0.2",
     "remark-gfm": "^3.0.1",

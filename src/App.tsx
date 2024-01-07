@@ -133,7 +133,7 @@ function App() {
             <p className="mr-3 text-2xl">
               {selectedExercise.sections.join(", ")} {">>"}
             </p>
-            <MarkdownParser>{selectedExercise.label}</MarkdownParser>
+            <MarkdownParser text={selectedExercise.label}></MarkdownParser>
           </span>
           <p>Connecteur : {selectedExercise.connector}</p>
 
@@ -143,11 +143,6 @@ function App() {
               ? "En une étape"
               : "Plusieurs étapes"}
           </p>
-          {selectedExercise.instruction && (
-            <p className="mt-5 mx-20">
-              <MarkdownParser>{selectedExercise.instruction}</MarkdownParser>
-            </p>
-          )}
 
           {questions.map((question, index) => (
             <QuestionDisplay

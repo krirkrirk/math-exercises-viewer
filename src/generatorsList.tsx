@@ -46,7 +46,7 @@ export const GeneratorsList = ({
                   backgroundColor: generator.isPremium ? "red" : "",
                 }}
               >
-                <MarkdownParser>{generator.label}</MarkdownParser>
+                <MarkdownParser text={generator.label}></MarkdownParser>
               </div>
             </div>
           </div>
