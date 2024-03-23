@@ -23,7 +23,14 @@ export interface Question<TIdentifiers = {}> {
   keys?: KeyId[];
   commands?: string[];
   coords?: number[];
-  options?: any;
+  options?: {
+    gridDistance?: [number, number] | false;
+    hideGrid?: boolean;
+    hideAxes?: boolean;
+    isGridBold?: boolean;
+    isGridSimple?: boolean;
+    isAxesRatioFixed?: boolean;
+  };
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
   propositions?: Proposition[];

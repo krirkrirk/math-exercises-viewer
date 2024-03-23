@@ -1,9 +1,10 @@
-import { MathComponent } from "mathjax-react";
 import MarkdownParser from "./markdownParser";
 import { Exercise, Question } from "./types";
 import { useEffect, useRef, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
+import "katex/dist/katex.min.css";
+import { InlineMath, BlockMath } from "react-katex";
 
 type Props = {
   exo: Exercise;
@@ -11,11 +12,9 @@ type Props = {
   index: number;
   isQCM: boolean;
 };
+
 export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
   const appletOnLoad = (app: any) => {
-    /**
-     * Ecrire ici les instructions à Geogebra
-     */
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
@@ -25,6 +24,31 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       question.coords[2],
       question.coords[3]
     );
+    if (question.options?.hideAxes) {
+      app.evalCommand("ShowAxes(false)");
+    }
+    if (question.options?.hideGrid) {
+      app.evalCommand("ShowGrid(false)");
+    }
+
+    const gridDistance = question.options?.gridDistance;
+    if (gridDistance) {
+      app.setGraphicsOptions(1, {
+        gridDistance: { x: gridDistance[0], y: gridDistance[1] },
+      });
+    }
+    const isGridBold = question.options?.isGridBold;
+    if (isGridBold) {
+      app.setGraphicsOptions(1, {
+        gridIsBold: false,
+      });
+    }
+    const isGridSimple = question.options?.isGridSimple;
+    if (isGridSimple) {
+      app.setGraphicsOptions(1, {
+        gridType: 0,
+      });
+    }
   };
 
   useEffect(() => {
@@ -38,7 +62,11 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       showAlgebraInput: false,
       showMenuBar: false,
       appletOnLoad: appletOnLoad,
-      filename: "/geogebra-default-ortho.ggb",
+      filename: question?.options?.isAxesRatioFixed
+        ? "/geogebra-default-ortho.ggb"
+        : "/geogebra-default-app.ggb",
+      // filename: "/geogebra-default-app.ggb",
+      showFullscreenButton: true,
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
@@ -74,7 +102,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     console.log(mathfieldRef.current);
     mathfieldRef.current.latex(question.answer);
   };
-  console.log(question.instruction);
+
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
@@ -82,13 +110,14 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       )}
 
       {question.startStatement && (
-        <MathComponent tex={`${question.startStatement} ${exo.connector!} ?`} />
+        <InlineMath math={`${question.startStatement} ${exo.connector!} ?`} />
       )}
       {question.commands?.length && (
         <>
           <div id={`ggb-question-${index}`}></div>
         </>
       )}
+      <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
       <AnswerDisplay
         answer={question.answer}
@@ -134,6 +163,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
             )}
           </div>
           <p>latex: {latex}</p>
+          <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
         </>
       )}
     </div>

@@ -4,6 +4,11 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { ReactNode } from "react";
 import remarkGfm from "remark-gfm";
+//@ts-ignore
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+//@ts-ignore
+import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 type Props = {
   text: string;
 };
@@ -24,6 +29,23 @@ export default function MarkdownParser({ text }: Props) {
         td: ({ node, ...props }) => (
           <td style={{ border: "1px solid", padding: "10px" }} {...props} />
         ),
+        code(props) {
+          const { children, className, node, ...rest } = props;
+          const match = /language-(\w+)/.exec(className || "");
+          return match ? (
+            <SyntaxHighlighter
+              {...rest}
+              PreTag="div"
+              children={String(children).replace(/\n$/, "")}
+              language={match[1]}
+              // style={dark}
+            />
+          ) : (
+            <code {...rest} className={className}>
+              {children}
+            </code>
+          );
+        },
       }}
     >
       {text}
