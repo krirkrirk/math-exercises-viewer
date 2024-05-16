@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
-import { InlineMath, BlockMath } from "react-katex";
+import { InlineMath } from "react-katex";
 
 type Props = {
   exo: Exercise;
@@ -18,7 +18,8 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
-    if (question.coords.length === 6) {
+
+    if (question.options?.is3D) {
       // Gestion des coordonnées en 3D
       app.setCoordSystem(
         question.coords[0],
@@ -37,6 +38,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         question.coords[3]
       );
     }
+
     if (question.options?.hideAxes) {
       app.evalCommand("ShowAxes(false)");
     }
