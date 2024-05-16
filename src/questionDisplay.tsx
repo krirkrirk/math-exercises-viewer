@@ -49,6 +49,10 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         gridType: 0,
       });
     }
+    const axisLabels = question.options?.axisLabels;
+    if (axisLabels) {
+      app.setAxisLabels(1, axisLabels[0], axisLabels[1]);
+    }
   };
 
   useEffect(() => {

@@ -30,6 +30,7 @@ export interface Question<TIdentifiers = {}> {
     isGridBold?: boolean;
     isGridSimple?: boolean;
     isAxesRatioFixed?: boolean;
+    axisLabels?: string[];
   };
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
