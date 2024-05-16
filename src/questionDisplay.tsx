@@ -18,12 +18,25 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
-    app.setCoordSystem(
-      question.coords[0],
-      question.coords[1],
-      question.coords[2],
-      question.coords[3]
-    );
+    if (question.coords.length === 6) {
+      // Gestion des coordonnées en 3D
+      app.setCoordSystem(
+        question.coords[0],
+        question.coords[1],
+        question.coords[2],
+        question.coords[3],
+        question.coords[4],
+        question.coords[5]
+      );
+    } else {
+      // Gestion des coordonnées en 2D
+      app.setCoordSystem(
+        question.coords[0],
+        question.coords[1],
+        question.coords[2],
+        question.coords[3]
+      );
+    }
     if (question.options?.hideAxes) {
       app.evalCommand("ShowAxes(false)");
     }
@@ -55,7 +68,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     var params = {
       id: `question${index}`,
       appName: "classic",
-      perspective: "G",
+      perspective: question.options?.is3D ? "T" : "G",
       width: 400,
       height: 300,
       showToolBar: false,
@@ -65,7 +78,6 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       filename: question?.options?.isAxesRatioFixed
         ? "/geogebra-default-ortho.ggb"
         : "/geogebra-default-app.ggb",
-      // filename: "/geogebra-default-app.ggb",
       showFullscreenButton: true,
     };
     var applet = new window.GGBApplet(params, true);
