@@ -55,7 +55,8 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     var params = {
       id: `question${index}`,
       appName: "classic",
-      perspective: "G",
+      perspective: "T",
+      test:"tt",
       width: 400,
       height: 300,
       showToolBar: false,
