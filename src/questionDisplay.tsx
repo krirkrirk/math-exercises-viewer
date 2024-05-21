@@ -107,9 +107,11 @@ export const QuestionDisplay = ({
 
   const [latex, setLatex] = useState("");
   const [veaResult, setVeaResult] = useState<boolean>();
+
   useEffect(() => {
     setVeaResult(undefined);
   }, [latex]);
+
   const vea = (input: string) => {
     fetch(`http://localhost:5000/vea?exoId=${exo.id}`, {
       method: "POST",
@@ -138,11 +140,21 @@ export const QuestionDisplay = ({
 
   const onCheckGGB = () => {
     //TODO Récupérer les objets crées par l'élève et vérifier si c'est ce qui est attendu
+
     const app = window[`questionAnswer${index}`];
+    const commandsObj = app.getAllObjectNames().map((value:string)=>{
+      const objType = app.getObjectType(value);
+      return (objType === "point") ? `${value}=(${app.getXcoord(value)},${app.getYcoord(value)})` : `${value} = ${app.getCommandString(value)}`}
+    )
+    console.log(commandsObj)
     //! toutes les commandes ggb sont dispo ici : https://wiki.geogebra.org/en/Reference:GeoGebra_Apps_API
+
     // par example on peut faire app.getAllObjectNames() pour avoir les noms de tous les objets présents dans le GGB
+
     // Force & honneur :)
   };
+
+
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
