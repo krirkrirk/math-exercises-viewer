@@ -11,9 +11,16 @@ type Props = {
   question: Question;
   index: number;
   isQCM: boolean;
+  isGGB: boolean;
 };
 
-export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
+export const QuestionDisplay = ({
+  exo,
+  question,
+  index,
+  isQCM,
+  isGGB,
+}: Props) => {
   const appletOnLoad = (app: any) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
@@ -76,6 +83,28 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     applet.inject(`ggb-question-${index}`);
   }, [index, question]);
 
+  useEffect(() => {
+    if (!isGGB) return;
+    var params = {
+      id: `questionAnswer${index}`,
+      appName: "classic",
+      perspective: "G",
+      width: 400,
+      height: 300,
+      showToolBar: true,
+      showAlgebraInput: true,
+      showMenuBar: true,
+      // appletOnLoad: appletOnLoad,
+      filename: question?.options?.isAxesRatioFixed
+        ? "/geogebra-default-ortho.ggb"
+        : "/geogebra-default-app.ggb",
+      // filename: "/geogebra-default-app.ggb",
+      showFullscreenButton: true,
+    };
+    var applet = new window.GGBApplet(params, true);
+    applet.inject(`ggb-question-answer-${index}`);
+  }, [index, question, isGGB]);
+
   const [latex, setLatex] = useState("");
   const [veaResult, setVeaResult] = useState<boolean>();
   useEffect(() => {
@@ -107,6 +136,13 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     mathfieldRef.current.latex(question.answer);
   };
 
+  const onCheckGGB = () => {
+    //TODO Récupérer les objets crées par l'élève et vérifier si c'est ce qui est attendu
+    const app = window[`questionAnswer${index}`];
+    //! toutes les commandes ggb sont dispo ici : https://wiki.geogebra.org/en/Reference:GeoGebra_Apps_API
+    // par example on peut faire app.getAllObjectNames() pour avoir les noms de tous les objets présents dans le GGB
+    // Force & honneur :)
+  };
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
@@ -168,6 +204,14 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           </div>
           <p>latex: {latex}</p>
           <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
+        </>
+      )}
+      {isGGB && (
+        <>
+          <div id={`ggb-question-answer-${index}`}></div>
+          <button className="ml-3 border" onClick={onCheckGGB}>
+            Check
+          </button>
         </>
       )}
     </div>
