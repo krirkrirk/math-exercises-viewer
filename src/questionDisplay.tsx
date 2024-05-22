@@ -5,6 +5,7 @@ import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
+import { GGBAnswerDisplay } from "./ggbAnswerDisplay";
 
 type Props = {
   exo: Exercise;
@@ -62,6 +63,38 @@ export const QuestionDisplay = ({
     }
   };
 
+  const appletOnLoadGgbAns = (app : any) => {
+    if (!question.studentGgbOptions?.coords?.length) return;
+    app.setCoordSystem(
+      ...question.studentGgbOptions?.coords
+    );
+    if (question.studentGgbOptions?.hideAxes) {
+      app.evalCommand("ShowAxes(false)");
+    }
+    if (question.studentGgbOptions?.hideGrid) {
+      app.evalCommand("ShowGrid(false)");
+    }
+
+    const gridDistance = question.studentGgbOptions?.gridDistance;
+    if (gridDistance) {
+      app.setGraphicsOptions(1, {
+        gridDistance: { x: gridDistance[0], y: gridDistance[1] },
+      });
+    }
+    const isGridBold = question.studentGgbOptions?.isGridBold;
+    if (isGridBold) {
+      app.setGraphicsOptions(1, {
+        gridIsBold: false,
+      });
+    }
+    const isGridSimple = question.studentGgbOptions?.isGridSimple;
+    if (isGridSimple) {
+      app.setGraphicsOptions(1, {
+        gridType: 0,
+      });
+    }
+  }
+
   useEffect(() => {
     var params = {
       id: `question${index}`,
@@ -93,8 +126,9 @@ export const QuestionDisplay = ({
       height: 300,
       showToolBar: true,
       showAlgebraInput: true,
-      showMenuBar: true,
-      // appletOnLoad: appletOnLoad,
+      showMenuBar: false,
+      customToolBar: question.studentGgbOptions?.customToolBar ?? "0|1|2" ,
+      appletOnLoad: appletOnLoadGgbAns,
       filename: question?.options?.isAxesRatioFixed
         ? "/geogebra-default-ortho.ggb"
         : "/geogebra-default-app.ggb",
@@ -107,6 +141,7 @@ export const QuestionDisplay = ({
 
   const [latex, setLatex] = useState("");
   const [veaResult, setVeaResult] = useState<boolean>();
+  const [ggbVeaResult,setGgbVeaResult] = useState<boolean>();
 
   useEffect(() => {
     setVeaResult(undefined);
@@ -144,14 +179,26 @@ export const QuestionDisplay = ({
     const app = window[`questionAnswer${index}`];
     const commandsObj = app.getAllObjectNames().map((value:string)=>{
       const objType = app.getObjectType(value);
-      return (objType === "point") ? `${value}=(${app.getXcoord(value)},${app.getYcoord(value)})` : `${value} = ${app.getCommandString(value)}`}
-    )
-    console.log(commandsObj)
-    //! toutes les commandes ggb sont dispo ici : https://wiki.geogebra.org/en/Reference:GeoGebra_Apps_API
+      return (objType === "point") ? `(${app.getXcoord(value)},${app.getYcoord(value)})` : `${app.getCommandString(value)}`
+    });
 
-    // par example on peut faire app.getAllObjectNames() pour avoir les noms de tous les objets présents dans le GGB
-
-    // Force & honneur :)
+    fetch(`http://localhost:5000/ggbvea?exoId=${exo.id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        ggbAns: commandsObj,
+        ggbVeaProps: { ggbAnswer: question.ggbAnswer, ...question.identifiers },
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setGgbVeaResult(res.result);
+      })
+      .catch((err) => console.log(err));
   };
 
 
@@ -171,10 +218,13 @@ export const QuestionDisplay = ({
       )}
       <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
-      <AnswerDisplay
+      { question.answer && <AnswerDisplay
         answer={question.answer}
         answerFormat={question.answerFormat ?? "tex"}
-      />
+      /> }
+      { question.ggbAnswer && <GGBAnswerDisplay
+        ggbAnswer={question.ggbAnswer}
+      /> }
       <div>
         <span>latex: {question.answer}</span>
         <button className="ml-3 border" onClick={onCopyLatex}>
@@ -224,6 +274,9 @@ export const QuestionDisplay = ({
           <button className="ml-3 border" onClick={onCheckGGB}>
             Check
           </button>
+          {ggbVeaResult !== undefined && (
+              <span>{ggbVeaResult ? "OK!" : "Non"}</span>
+          )}
         </>
       )}
     </div>
