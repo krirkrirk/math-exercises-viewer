@@ -18,6 +18,9 @@ const VariationTable: React.FC<VariationTableProps> = ({
   const yRange = yMax - yMin;
   const yScale = height / (yRange * 1.2);
 
+  const yTop = 100;
+  const yBottom = 200;
+
   return (
     <svg
       width={width}
@@ -42,7 +45,7 @@ const VariationTable: React.FC<VariationTableProps> = ({
       </text>
       {xValues.map((x, index) => {
         const xPos = (index + 1) * xStep;
-        const yPos = height - yScale * (fValues[index] - yMin) - 50;
+        const yPos = index % 2 === 0 ? yTop : yBottom;
         return (
           <React.Fragment key={index}>
             {/* Valeurs de x */}
@@ -60,10 +63,10 @@ const VariationTable: React.FC<VariationTableProps> = ({
             </text>
             {index > 0 && (
               <line
-                x1={index * xStep + 55}
-                y1={height - yScale * (fValues[index - 1] - yMin) + 50} // Adjust y position for shorter arrows
+                x1={index * xStep + xStep / 3}
+                y1={index % 2 === 0 ? yBottom + 95 : yTop + 95} // Adjust y position for shorter arrows
                 x2={xPos + 40}
-                y2={yPos + 100}
+                y2={yPos + 95}
                 stroke="black"
                 markerEnd="url(#arrow)"
               />
