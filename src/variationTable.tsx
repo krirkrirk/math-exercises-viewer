@@ -1,5 +1,5 @@
 import React from "react";
-import MathJaxSvg from "./mathJaxSvg";
+import MathJaxComponent from "./mathJaxComponent";
 
 type VariationTableProps = {
   xValues: number[];
@@ -10,13 +10,19 @@ const VariationTable: React.FC<VariationTableProps> = ({
   xValues,
   fValues,
 }) => {
-  const width = 800;
-  const height = 400;
+  const width = 1200;
+  const height = 800;
   const xStep = width / (xValues.length + 1);
   const yMax = Math.max(...fValues);
   const yMin = Math.min(...fValues) - 5;
   const yRange = yMax - yMin;
   const yScale = height / (yRange * 1.2);
+
+  // Determine the unique y positions for different fValues
+  const yPositions = fValues.map(
+    (value) => height - yScale * (value - yMin) - 50
+  );
+  const uniqueYPositions = Array.from(new Set(yPositions));
 
   return (
     <svg
@@ -34,36 +40,44 @@ const VariationTable: React.FC<VariationTableProps> = ({
       {/* Ligne séparant x de f(x) */}
       <line x1={0} y1={100} x2={width} y2={100} stroke="black" />
       {/* Texte des en-têtes */}
-      <text x={xStep / 2} y={75} fontSize="14" textAnchor="middle">
-        <MathJaxSvg latex={"x"} />
-      </text>
-      <text x={xStep / 2} y={200} fontSize="14" textAnchor="middle">
-        <MathJaxSvg latex={"f(x)"} />
-      </text>
+      <foreignObject x={xStep / 2 - 20} y={55} width="40" height="40">
+        <MathJaxComponent latex={"x"} />
+      </foreignObject>
+      <foreignObject x={xStep / 2 - 20} y={105} width="40" height="40">
+        <MathJaxComponent latex={"f(x)"} />
+      </foreignObject>
       {xValues.map((x, index) => {
         const xPos = (index + 1) * xStep;
-        const yPos = height - yScale * (fValues[index] - yMin) - 50;
+        const yPos = uniqueYPositions.indexOf(
+          height - yScale * (fValues[index] - yMin) - 50
+        );
         return (
           <React.Fragment key={index}>
             {/* Valeurs de x */}
-            <text x={xPos + 50} y={75} fontSize="12" textAnchor="middle">
-              <MathJaxSvg latex={`${x}`} />
-            </text>
+            <foreignObject x={xPos + 30} y={55} width="40" height="40">
+              <MathJaxComponent latex={`${x}`} />
+            </foreignObject>
             {/* Valeurs de f(x) */}
-            <text
-              x={xPos + 50}
-              y={yPos + 100}
-              fontSize="12"
-              textAnchor="middle"
+            <foreignObject
+              x={xPos + 30}
+              y={uniqueYPositions[yPos] + 90}
+              width="40"
+              height="40"
             >
-              <MathJaxSvg latex={`${fValues[index]}`} />
-            </text>
+              <MathJaxComponent latex={`${fValues[index]}`} />
+            </foreignObject>
             {index > 0 && (
               <line
                 x1={index * xStep + 55}
-                y1={height - yScale * (fValues[index - 1] - yMin) + 50} // Adjust y position for shorter arrows
-                x2={xPos + 40}
-                y2={yPos + 100}
+                y1={
+                  uniqueYPositions[
+                    uniqueYPositions.indexOf(
+                      height - yScale * (fValues[index - 1] - yMin) - 50
+                    )
+                  ] + 90
+                }
+                x2={xPos + 30}
+                y2={uniqueYPositions[yPos] + 90}
                 stroke="black"
                 markerEnd="url(#arrow)"
               />

@@ -13,19 +13,19 @@ const tex = new TeX({ packages: AllPackages });
 const svg = new SVG({ fontCache: "local" });
 const document = mathjax.document("", { InputJax: tex, OutputJax: svg });
 
-const MathJaxSvg: React.FC<{ latex: string }> = ({ latex }) => {
-  const svgRef = useRef<HTMLDivElement>(null);
+const MathJaxComponent: React.FC<{ latex: string }> = ({ latex }) => {
+  const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     const node = svgRef.current;
     if (node) {
       node.innerHTML = "";
       const math = document.convert(latex, { display: true });
-      node.appendChild(adaptor.node(math));
+      node.appendChild(math);
     }
   }, [latex]);
 
-  return <div ref={svgRef} style={{ display: "inline-block" }} />;
+  return <svg ref={svgRef} />;
 };
 
-export default MathJaxSvg;
+export default MathJaxComponent;
