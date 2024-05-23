@@ -1,4 +1,5 @@
 import React from "react";
+import MathJaxSvg from "./mathJaxSvg";
 
 type VariationTableProps = {
   xValues: number[];
@@ -13,7 +14,7 @@ const VariationTable: React.FC<VariationTableProps> = ({
   const height = 400;
   const xStep = width / (xValues.length + 1);
   const yMax = Math.max(...fValues);
-  const yMin = Math.min(...fValues);
+  const yMin = Math.min(...fValues) - 5;
   const yRange = yMax - yMin;
   const yScale = height / (yRange * 1.2);
 
@@ -34,10 +35,10 @@ const VariationTable: React.FC<VariationTableProps> = ({
       <line x1={0} y1={100} x2={width} y2={100} stroke="black" />
       {/* Texte des en-têtes */}
       <text x={xStep / 2} y={75} fontSize="14" textAnchor="middle">
-        x
+        <MathJaxSvg latex={"x"} />
       </text>
-      <text x={xStep / 2} y={125} fontSize="14" textAnchor="middle">
-        f(x)
+      <text x={xStep / 2} y={200} fontSize="14" textAnchor="middle">
+        <MathJaxSvg latex={"f(x)"} />
       </text>
       {xValues.map((x, index) => {
         const xPos = (index + 1) * xStep;
@@ -46,7 +47,7 @@ const VariationTable: React.FC<VariationTableProps> = ({
           <React.Fragment key={index}>
             {/* Valeurs de x */}
             <text x={xPos + 50} y={75} fontSize="12" textAnchor="middle">
-              {x}
+              <MathJaxSvg latex={`${x}`} />
             </text>
             {/* Valeurs de f(x) */}
             <text
@@ -55,7 +56,7 @@ const VariationTable: React.FC<VariationTableProps> = ({
               fontSize="12"
               textAnchor="middle"
             >
-              {fValues[index]}
+              <MathJaxSvg latex={`${fValues[index]}`} />
             </text>
             {index > 0 && (
               <line
