@@ -46,6 +46,7 @@ export interface Question<TIdentifiers = {}> {
     isXAxesNatural?: boolean;
     xAxisSteps?: number;
     yAxisSteps?: number;
+    enableShiftDragZoom?: boolean;
     coords?: number[];
   };
 
