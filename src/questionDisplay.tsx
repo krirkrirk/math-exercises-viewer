@@ -64,6 +64,7 @@ export const QuestionDisplay = ({
   };
 
   const appletOnLoadGgbAns = (app : any) => {
+    app.enableShiftDragZoom(false);
     if (!question.studentGgbOptions?.coords?.length) return;
     app.setCoordSystem(
       ...question.studentGgbOptions?.coords
@@ -93,6 +94,9 @@ export const QuestionDisplay = ({
         gridType: 0,
       });
     }
+    const xAxisSteps = question.studentGgbOptions?.xAxisSteps ?? 1
+    const yAxisSteps = question.studentGgbOptions?.yAxisSteps ?? 1
+    app.setAxisSteps(1,xAxisSteps,yAxisSteps)
   }
 
   useEffect(() => {
@@ -127,7 +131,7 @@ export const QuestionDisplay = ({
       showToolBar: true,
       showAlgebraInput: true,
       showMenuBar: false,
-      customToolBar: question.studentGgbOptions?.customToolBar ?? "0|1|2" ,
+      customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2" ,
       appletOnLoad: appletOnLoadGgbAns,
       filename: question?.options?.isAxesRatioFixed
         ? "/geogebra-default-ortho.ggb"
@@ -179,7 +183,7 @@ export const QuestionDisplay = ({
     const app = window[`questionAnswer${index}`];
     const commandsObj = app.getAllObjectNames().map((value:string)=>{
       const objType = app.getObjectType(value);
-      return (objType === "point") ? `(${app.getXcoord(value)},${app.getYcoord(value)})` : `${app.getCommandString(value)}`
+      return (objType === "point" || objType ==="vector") ? `(${app.getXcoord(value)};${app.getYcoord(value)})` : `${app.getCommandString(value)}`
     });
 
     fetch(`http://localhost:5000/ggbvea?exoId=${exo.id}`, {

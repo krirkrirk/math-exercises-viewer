@@ -24,6 +24,7 @@ export interface Question<TIdentifiers = {}> {
   keys?: KeyId[];
   commands?: string[];
   coords?: number[];
+
   options?: {
     gridDistance?: [number, number] | false;
     hideGrid?: boolean;
@@ -33,6 +34,7 @@ export interface Question<TIdentifiers = {}> {
     isAxesRatioFixed?: boolean;
     axisLabels?: string[];
   };
+
   studentGgbOptions?: {
     customToolBar?: string;
     gridDistance?: [number, number] | false;
@@ -42,8 +44,11 @@ export interface Question<TIdentifiers = {}> {
     isGridSimple?: boolean;
     isAxesRatioFixed?: boolean;
     isXAxesNatural?: boolean;
+    xAxisSteps?: number;
+    yAxisSteps?: number;
     coords?: number[];
   };
+
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
   propositions?: Proposition[];
@@ -53,17 +58,21 @@ export type QCMGenerator<TIdentifiers> = (
   n: number,
   args: { answer: string } & TIdentifiers
 ) => Proposition[];
+
 export type VEA<TIdentifiers> = (
   studentAnswer: string,
   args: { answer: string } & TIdentifiers
 ) => boolean;
+
 export type GGBVEA<TIdentifiers> = (
   studentAnswer: string[],
   args: { ggbAnswer: string[] } & TIdentifiers
 ) => boolean;
+
 export type QuestionGenerator<TIdentifiers = {}, TOptions = {}> = (
   opts?: TOptions
 ) => Question<TIdentifiers>;
+
 export interface Exercise<TIdentifiers = {}> {
   id: string;
   isSingleStep: boolean;
