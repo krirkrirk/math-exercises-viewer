@@ -29,18 +29,18 @@ const VariationTable: React.FC<VariationTableProps> = ({
       style={{ background: "white", border: "1px solid black" }}
     >
       {/* Ligne du haut */}
-      <line x1={0} y1={50} x2={width} y2={50} stroke="black" />
+      <line x1={0} y1={0} x2={width} y2={0} stroke="black" />
       {/* Ligne du bas */}
       <line x1={0} y1={height} x2={width} y2={height} stroke="black" />
       {/* Première colonne */}
       <line x1={xStep} y1={0} x2={xStep} y2={height} stroke="black" />
       {/* Ligne séparant x de f(x) */}
-      <line x1={0} y1={100} x2={width} y2={100} stroke="black" />
+      <line x1={0} y1={50} x2={width} y2={50} stroke="black" />
       {/* Texte des en-têtes */}
-      <text x={xStep / 2} y={75} fontSize="14" textAnchor="middle">
+      <text x={xStep / 2} y={25} fontSize="14" textAnchor="middle">
         x
       </text>
-      <text x={xStep / 2} y={200} fontSize="14" textAnchor="middle">
+      <text x={xStep / 2} y={225} fontSize="14" textAnchor="middle">
         f(x)
       </text>
       {xValues.map((x, index) => {
@@ -49,24 +49,19 @@ const VariationTable: React.FC<VariationTableProps> = ({
         return (
           <React.Fragment key={index}>
             {/* Valeurs de x */}
-            <text x={xPos + 50} y={75} fontSize="12" textAnchor="middle">
+            <text x={xPos + 50} y={25} fontSize="12" textAnchor="middle">
               {x}
             </text>
             {/* Valeurs de f(x) */}
-            <text
-              x={xPos + 50}
-              y={yPos + 100}
-              fontSize="12"
-              textAnchor="middle"
-            >
+            <text x={xPos + 50} y={yPos + 75} fontSize="12" textAnchor="middle">
               {fValues[index]}
             </text>
             {index > 0 && (
               <line
                 x1={index * xStep + xStep / 3}
-                y1={index % 2 === 0 ? yBottom + 95 : yTop + 95} // Adjust y position for shorter arrows
+                y1={index % 2 === 0 ? yBottom + 70 : yTop + 70}
                 x2={xPos + 40}
-                y2={yPos + 95}
+                y2={yPos + 70}
                 stroke="black"
                 markerEnd="url(#arrow)"
               />

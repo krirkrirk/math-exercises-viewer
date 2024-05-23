@@ -7,7 +7,7 @@ import { QuestionDisplay } from "./questionDisplay";
 import { GeneratorsList } from "./generatorsList";
 import { GeneratorsListByLevel } from "./generatorsListByLevel";
 import { GeneratorsListBySection } from "./generatorsListBySection";
-import VariationTable from "./variationTable"; // Import the new component
+import VariationTable from "./variationTable";
 
 function App() {
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
@@ -77,7 +77,6 @@ function App() {
   return (
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
       <VariationTable xValues={[-2, 3, 5, 10]} fValues={[1, 3, 2, 6]} />{" "}
-      {/* Add this line */}
       {!!allExercises.length && (
         <div>
           <p>{exoCount} Générateurs</p>
