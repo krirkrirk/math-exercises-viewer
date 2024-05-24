@@ -65,6 +65,11 @@ export const QuestionDisplay = ({
 
   const appletOnLoadGgbAns = (app : any) => {
     if (!question.studentGgbOptions?.coords?.length) return;
+    
+    if (question.studentGgbOptions?.initialCommands){
+      question.studentGgbOptions.initialCommands.forEach((command)=>app.evalCommand(command))
+    } 
+
     app.setCoordSystem(
       ...question.studentGgbOptions?.coords
     );
@@ -95,7 +100,8 @@ export const QuestionDisplay = ({
     }
     const xAxisSteps = question.studentGgbOptions?.xAxisSteps ?? 1;
     const yAxisSteps = question.studentGgbOptions?.yAxisSteps ?? 1;
-    app.setAxisSteps(1,xAxisSteps,yAxisSteps);
+    //app.setAxisSteps(1,xAxisSteps,yAxisSteps);
+
     const enableShiftDragZoom = question.studentGgbOptions?.enableShiftDragZoom ?? false;
     app.enableShiftDragZoom(enableShiftDragZoom);
   }
@@ -134,9 +140,9 @@ export const QuestionDisplay = ({
       showMenuBar: false,
       customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2" ,
       appletOnLoad: appletOnLoadGgbAns,
-      filename: question?.options?.isAxesRatioFixed
-        ? "/geogebra-default-ortho.ggb"
-        : "/geogebra-default-app.ggb",
+      filename: (question?.studentGgbOptions?.isAxesRatioFixed === false)
+        ? "/geogebra-default-app.ggb"
+        : "/geogebra-default-ortho.ggb",
       // filename: "/geogebra-default-app.ggb",
       showFullscreenButton: true,
     };
