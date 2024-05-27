@@ -7,6 +7,7 @@ import { QuestionDisplay } from "./questionDisplay";
 import { GeneratorsList } from "./generatorsList";
 import { GeneratorsListByLevel } from "./generatorsListByLevel";
 import { GeneratorsListBySection } from "./generatorsListBySection";
+import VariationTable from "./variationTable";
 
 function App() {
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
@@ -16,7 +17,6 @@ function App() {
   const [nextExoId, setNextExoId] = useState("");
   const [exoCount, setExoCount] = useState(0);
   const onSelect = (exoId: string) => {
-    // setSelectedExercise(allExercises.find((exo) => exo.id === e.target.value));
     window.location.href = `/exo?exoId=${exoId}`;
   };
 
@@ -44,7 +44,6 @@ function App() {
           .then((res) => {
             setSelectedExercise(res.exercise);
             setQuestions(res.questions);
-
             setNextExoId(res.nextId);
             setPrevExoId(res.prevId);
           })
@@ -74,15 +73,17 @@ function App() {
     if (!prevExoId) return;
     onSelect(prevExoId);
   };
+
   return (
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
+      <VariationTable xValues={[-2, 2]} fValues={[3, 2]} />{" "}
       {!!allExercises.length && (
         <div>
           <p>{exoCount} Générateurs</p>
           <div>
-            <button onClick={(e) => setDisplayType("all")}>Tous</button>
-            <button onClick={(e) => setDisplayType("byLevel")}>Niveaux</button>
-            <button onClick={(e) => setDisplayType("bySection")}>
+            <button onClick={() => setDisplayType("all")}>Tous</button>
+            <button onClick={() => setDisplayType("byLevel")}>Niveaux</button>
+            <button onClick={() => setDisplayType("bySection")}>
               Sections
             </button>
           </div>
@@ -101,7 +102,7 @@ function App() {
         <div style={{ width: "100%" }}>
           {!isQCM && (
             <button
-              onClick={(e) =>
+              onClick={() =>
                 (window.location.href = window.location.href + "&isQCM=true")
               }
               className="border-2 p-3"
@@ -111,7 +112,7 @@ function App() {
           )}
           {isQCM && (
             <button
-              onClick={(e) =>
+              onClick={() =>
                 (window.location.href = window.location.href.replace(
                   "&isQCM=true",
                   ""
@@ -123,10 +124,10 @@ function App() {
             </button>
           )}
 
-          <button onClick={(e) => onPrev()} className="border-2 p-3">
+          <button onClick={onPrev} className="border-2 p-3">
             Prev Generator
           </button>
-          <button onClick={(e) => onNext()} className="border-2 p-3">
+          <button onClick={onNext} className="border-2 p-3">
             Next Generator
           </button>
           <span className="flex p-3">
