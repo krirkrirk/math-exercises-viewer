@@ -5,6 +5,7 @@ import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
+import { SvgDisplay } from "./svgDisplay";
 
 type Props = {
   exo: Exercise;
@@ -184,6 +185,12 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
         </>
       )}
+
+      {
+        <div>
+          <SvgDisplay variations={[{start:2,startSign:"-",end:5,zero:8},{start:2,startSign:"-",end:5,zero:8}]} width={300} height={150}></SvgDisplay>
+        </div>
+      }
     </div>
   );
 };

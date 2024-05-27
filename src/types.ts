@@ -108,3 +108,10 @@ export type Section =
   | "Primitives"
   | "Équations différentielles"
   | "Trigonométrie";
+
+export type FunctionVariations = {
+  start: number | "-infini" | "+infini";
+  startSign: "-" | "+";
+  end: number | "-infini" | "+infini";
+  zero?: number;
+};
