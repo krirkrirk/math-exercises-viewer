@@ -188,7 +188,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
 
       {
         <div>
-          <SvgDisplay variations={[{start:2,startSign:"-",end:5,zero:8},{start:2,startSign:"-",end:5,zero:8}]} width={300} height={150}></SvgDisplay>
+          <SvgDisplay variations={[{start:2,startSign:"-",end:5,zero:8}]} width={300} height={150}></SvgDisplay>
         </div>
       }
     </div>
