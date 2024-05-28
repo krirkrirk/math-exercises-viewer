@@ -36,6 +36,7 @@ export interface Question<TIdentifiers = {}> {
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
   propositions?: Proposition[];
+  signTable?: FunctionVariations;
 }
 
 export type QCMGenerator<TIdentifiers> = (
@@ -113,5 +114,10 @@ export type FunctionVariations = {
   start: number | "-infini" | "+infini";
   startSign: "-" | "+";
   end: number | "-infini" | "+infini";
-  zero?: number;
+  variations: { changePoint: number; sign: "+" | "-" }[];
+};
+
+export type Variation = {
+  changePoint: number;
+  sign: "+" | "-";
 };
