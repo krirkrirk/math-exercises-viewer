@@ -32,11 +32,11 @@ const VariationTab = ({width,height} : {width:number,height:number}) => {
 
 const VariationsDisplay = ({variations,width,height} : Props ) => {
 
-    const xTabHeight = height/2-10
-    const fTabHeight = height - xTabHeight
+    const xTabHeight = height/2-10;
+    const fTabHeight = height - xTabHeight;
 
-    let result : JSX.Element[] = []
-    const ySign = (fTabHeight)/2+xTabHeight
+    let result : JSX.Element[] = [];
+    const ySign = (fTabHeight/2)+xTabHeight;
     const yX = (xTabHeight/2)+5;
 
     let xX = 50;
