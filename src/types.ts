@@ -62,6 +62,10 @@ export interface Exercise<TIdentifiers = {}> {
   freeTimer: number;
   getPropositions?: QCMGenerator<{ answer: string } & TIdentifiers>;
   isAnswerValid?: VEA<TIdentifiers>;
+  data: {
+    xValues: number[];
+    fValues: number[];
+  };
 }
 
 export type Level =

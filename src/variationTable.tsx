@@ -6,12 +6,12 @@ type VariationTableProps = {
 };
 
 const WIDTH = 800;
-const HEIGHT = 400;
+const HEIGHT = 200;
 const HEADER_HEIGHT = 50;
 const TEXT_Y_OFFSET = 25;
 const FX_Y_OFFSET = 75;
-const Y_TOP = 100;
-const Y_BOTTOM = 200;
+const Y_TOP = 0;
+const Y_BOTTOM = 100;
 const OFFSET = 10;
 
 const VariationTable: React.FC<VariationTableProps> = ({
