@@ -5,6 +5,7 @@ import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
+import VariationTable from "./variationTable";
 
 type Props = {
   exo: Exercise;
@@ -121,6 +122,13 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           <div id={`ggb-question-${index}`}></div>
         </>
       )}
+      {question.variationTable && (
+        <VariationTable
+          xValues={question.variationTable.xValues}
+          fValues={question.variationTable.fValues}
+        />
+      )}
+
       <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
       <AnswerDisplay
