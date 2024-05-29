@@ -98,6 +98,10 @@ export const QuestionDisplay = ({
         gridType: 0,
       });
     }
+    const xAxisSteps = question.studentGgbOptions?.xAxisSteps ?? 1;
+    const yAxisSteps = question.studentGgbOptions?.yAxisSteps ?? 1;
+    const defaultValue = 2;
+    app.setAxisSteps((question.studentGgbOptions?.xAxisSteps || question.studentGgbOptions?.yAxisSteps) ?  1 : defaultValue,xAxisSteps,yAxisSteps);
 
     const enableShiftDragZoom = question.studentGgbOptions?.enableShiftDragZoom ?? false;
     app.enableShiftDragZoom(enableShiftDragZoom);
