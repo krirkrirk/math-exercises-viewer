@@ -8,6 +8,7 @@ import { GeneratorsList } from "./generatorsList";
 import { GeneratorsListByLevel } from "./generatorsListByLevel";
 import { GeneratorsListBySection } from "./generatorsListBySection";
 import VariationTable from "./variationTable";
+import { SignTable } from "./signTable";
 
 function App() {
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
@@ -76,7 +77,6 @@ function App() {
 
   return (
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
-      <VariationTable xValues={[-2, 2]} fValues={[3, 2]} />{" "}
       {!!allExercises.length && (
         <div>
           <p>{exoCount} Générateurs</p>
