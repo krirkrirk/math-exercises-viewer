@@ -5,6 +5,7 @@ import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
+import { SignTable} from "./signTable";
 
 type Props = {
   exo: Exercise;
@@ -134,6 +135,11 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         <>
           <div id={`ggb-question-${index}`}></div>
         </>
+      )}
+      {question.signTable && (
+        <div>
+          <SignTable functionVariations={question.signTable} width={300} height={150}></SignTable>
+        </div>
       )}
       <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>

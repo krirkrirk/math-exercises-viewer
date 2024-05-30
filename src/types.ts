@@ -36,6 +36,7 @@ export interface Question<TIdentifiers = {}> {
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
   propositions?: Proposition[];
+  signTable?: FunctionVariations;
 }
 
 export type QCMGenerator<TIdentifiers> = (
@@ -108,3 +109,20 @@ export type Section =
   | "Primitives"
   | "Équations différentielles"
   | "Trigonométrie";
+
+export type FunctionVariations = {
+  start: MathLatex;
+  startSign: "-" | "+";
+  end: MathLatex;
+  variations: Variation[];
+};
+
+export type Variation = {
+  changePoint: MathLatex;
+  sign: "+" | "-";
+};
+
+export type MathLatex = {
+  latexValue: string;
+  mathValue: number;
+};
