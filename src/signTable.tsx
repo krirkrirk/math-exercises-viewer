@@ -73,7 +73,7 @@ const VariationsDisplay = ({functionVariations}:{functionVariations:FunctionVari
         <LatexInSVG 
             key={uniqueKey++} 
             latex={`$${functionVariations.end.latexValue}$`} 
-            x={(functionVariations.end.mathValue === null) ? xX - 30 : xX - (functionVariations.end.mathValue+"").length*7}
+            x={(functionVariations.end.mathValue === null) ? xX - 30 : xX - (functionVariations.end.mathValue.toFixed(2)).length*4}
             y={yX} 
             width={50} 
             height={25}
@@ -91,7 +91,7 @@ const getVariationXJSXElements = (uniqueKey:number, variation:Variation, xX:numb
     const elements = []
     elements.push(
         <LatexInSVG  key={uniqueKey++} latex={`$${variation.changePoint.latexValue}$`} 
-            x={((variation.changePoint.latexValue).length <=1) ? xX : xX - (((variation.changePoint.mathValue+"").length-1)*5)} 
+            x={((variation.changePoint.latexValue).length <=1) ? xX : xX - (((variation.changePoint.mathValue.toFixed(2)).length-1)*2)} 
             y={yX} width={50} height={25}
         />,
         <line key={uniqueKey++} x1={xX+4.5} y1={dim.xTabHeight} x2={xX+4.5} y2={dim.height} stroke="black"></line>,
