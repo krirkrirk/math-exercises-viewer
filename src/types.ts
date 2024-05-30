@@ -30,6 +30,7 @@ export interface Question<TIdentifiers = {}> {
     isGridBold?: boolean;
     isGridSimple?: boolean;
     isAxesRatioFixed?: boolean;
+    is3D?: boolean;
     axisLabels?: string[];
   };
   divisionFormat?: "fraction" | "obelus";
@@ -53,8 +54,6 @@ export interface Exercise<TIdentifiers = {}> {
   id: string;
   isSingleStep: boolean;
   label: string;
-  sections: Section[];
-  levels: Level[];
   connector?: "=" | "\\iff" | "\\approx";
   generator: (n: number) => Question<TIdentifiers>[];
   maxAllowedQuestions?: number;
@@ -63,6 +62,9 @@ export interface Exercise<TIdentifiers = {}> {
   freeTimer: number;
   getPropositions?: QCMGenerator<{ answer: string } & TIdentifiers>;
   isAnswerValid?: VEA<TIdentifiers>;
+  hasGeogebra?: boolean;
+  is3d?: boolean;
+  subject: "Mathématiques" | "Chimie" | "Physique";
 }
 
 export type Level =
