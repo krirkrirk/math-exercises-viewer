@@ -73,7 +73,7 @@ const VariationsDisplay = ({functionVariations}:{functionVariations:FunctionVari
         <LatexInSVG 
             key={uniqueKey++} 
             latex={`$${functionVariations.end.latexValue}$`} 
-            x={(functionVariations.end.mathValue === null) ? xX - 30 : xX - (functionVariations.end.mathValue.toFixed(2)).length*4}
+            x={(functionVariations.end.mathValue === null) ? xX - 30 : xX - (functionVariations.end.mathValue.toFixed(0)).length*7}
             y={yX} 
             width={50} 
             height={25}
