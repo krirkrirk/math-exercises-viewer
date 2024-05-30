@@ -17,6 +17,8 @@ export type Proposition = {
 
 export interface Question<TIdentifiers = {}> {
   instruction: string;
+  hint?: string;
+  correction?: string;
   startStatement?: string;
   answer: string;
   answerFormat: "tex" | "raw";
