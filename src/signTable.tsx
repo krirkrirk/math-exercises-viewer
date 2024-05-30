@@ -12,9 +12,9 @@ const Dimensions = createContext({width:0,height:0,xTabHeight:0,fTabHeight:0,xTa
 
 
 export const SignTable = ({ functionVariations, width, height}: Props) => {
-    const xTabHeight = height/2-10;
+    const xTabHeight = Math.floor(height/2-10);
     const fTabHeight = height - xTabHeight;
-    const xTabWidth = width*0.15
+    const xTabWidth = Math.floor(width*0.15)
     return <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} style={{margin:0}}>
         <Dimensions.Provider value={{width,height,xTabHeight,fTabHeight,xTabWidth}}>
             <VariationTab/>
@@ -47,13 +47,13 @@ const VariationsDisplay = ({functionVariations}:{functionVariations:FunctionVari
 
     let result : JSX.Element[] = [];
     const ySign = fTabHeight/2+xTabHeight-10;
-    const yX = (xTabHeight/2)-15;
+    const yX = xTabHeight/2-15;
 
     let xX = dim.xTabWidth+10;
 
     let variation: Variation;
 
-    let xXStep = (dim.width-15-xX)/(2+functionVariations.variations.length-1);
+    let xXStep = Math.floor((dim.width-15-xX)/(1+functionVariations.variations.length));
 
     
     result.push(
