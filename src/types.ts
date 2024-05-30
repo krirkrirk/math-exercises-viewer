@@ -111,13 +111,18 @@ export type Section =
   | "Trigonométrie";
 
 export type FunctionVariations = {
-  start: number | "-infini" | "+infini";
+  start: MathLatex;
   startSign: "-" | "+";
-  end: number | "-infini" | "+infini";
-  variations: { changePoint: number; sign: "+" | "-" }[];
+  end: MathLatex;
+  variations: Variation[];
 };
 
 export type Variation = {
-  changePoint: number;
+  changePoint: MathLatex;
   sign: "+" | "-";
+};
+
+export type MathLatex = {
+  latexValue: string;
+  mathValue: number;
 };

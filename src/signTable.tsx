@@ -1,4 +1,5 @@
 import { FunctionVariations, Variation } from "./types";
+import { LatexInSVG } from "./latexInSvg";
 
 type Props = {
   functionVariations: FunctionVariations
@@ -23,21 +24,23 @@ const VariationTab = ({width,height} : {width:number,height:number}) => {
         <rect width={width} height={height} x={1} y={1} style={{fill:"white",stroke:"black",strokeWidth:1}}/>
         <line x1={1} y1={xTabHeight} x2={width} y2={xTabHeight} stroke="black"/>
         <line x1={40} y1={1} x2={40} y2={height} stroke="black"/>
-        <text x={17} y={xTabHeight/2+5}>x</text>
-        <text x={10} y={(fTabHeight/2)+xTabHeight}>f(x)</text>
-    </g>
+        <LatexInSVG latex={"$x$"} x={15} y={xTabHeight/2-15} width={25} height={25}></LatexInSVG>
+        <LatexInSVG latex={"$f(x)$"} x={1} y={fTabHeight+10} width={50} height={50}></LatexInSVG>
+     </g>
 }
 
 
 const VariationsDisplay = ({functionVariations,width,height} : Props ) => {
+
+    let uniqueKey = 0;
 
 
     const xTabHeight = height/2-10;
     const fTabHeight = height - xTabHeight;
 
     let result : JSX.Element[] = [];
-    const ySign = (fTabHeight/2)+xTabHeight+5;
-    const yX = (xTabHeight/2)+5;
+    const ySign = fTabHeight+10;
+    const yX = (xTabHeight/2)-15;
 
     let xX = 50;
 
@@ -48,8 +51,11 @@ const VariationsDisplay = ({functionVariations,width,height} : Props ) => {
     const getVariationXJSXElements = () : JSX.Element[]  => {
         const elements = []
         elements.push(
-            <text x={xX} y={yX}>{variation.changePoint}</text>,
-            <line x1={xX+4.5} y1={xTabHeight} x2={xX+4.5} y2={height} stroke="black"></line>
+            <LatexInSVG  key={uniqueKey++} latex={`$${variation.changePoint.latexValue}$`} 
+                x={((variation.changePoint.latexValue).length <=1) ? xX : xX - (((variation.changePoint.mathValue+"").length-1)*5)} 
+                y={yX} width={50} height={50}
+            />,
+            <line key={uniqueKey++} x1={xX+4.5} y1={xTabHeight} x2={xX+4.5} y2={height} stroke="black"></line>,
         )
         return elements
     }
@@ -57,16 +63,16 @@ const VariationsDisplay = ({functionVariations,width,height} : Props ) => {
     const getSignVaraiationJSXElements = () : JSX.Element[] => {
         const elements : JSX.Element[] = []
         
-        elements.push(<text x={xX} y={ySign}>{0}</text>)
+        elements.push(<LatexInSVG key={uniqueKey++} latex={`$0$`} x={xX} y={ySign} width={50} height={50}/>)
 
-        elements.push(<text x={xX+xXStep/2} y={ySign} fontSize={25}>{variation.sign}</text>)
+        elements.push(<LatexInSVG key={uniqueKey++} latex={`$${variation.sign}$`} x={xX+xXStep/2} y={ySign} width={50} height={50}/>)
 
         return elements
     }
 
     result.push(
-        <text x={xX} y={yX}>{functionVariations.start}</text>,
-        <text x={xX+xXStep/2-8} y={ySign} fontSize={25}>{functionVariations.startSign}</text>
+        <LatexInSVG key={uniqueKey++} latex={`$${functionVariations.start.latexValue}$`} x={xX} y={yX} width={50} height={50}/>,
+        <LatexInSVG key={uniqueKey++} latex={`$${functionVariations.startSign}$`} x={xX+xXStep/2-8} y={ySign} width={50} height={50}/>,
     )
     for (let i = 0; i<functionVariations.variations.length ; i++){
         variation = functionVariations.variations[i]
@@ -75,7 +81,14 @@ const VariationsDisplay = ({functionVariations,width,height} : Props ) => {
     }
     xX = xX + xXStep
     result.push(
-        <text x={(functionVariations.end+"").length > 1 ? xX -10 : xX } y={yX}>{functionVariations.end}</text>
+        <LatexInSVG 
+            key={uniqueKey++} 
+            latex={`$${functionVariations.end.latexValue}$`} 
+            x={(functionVariations.end.mathValue === null) ? xX -30 : xX-1-(xX+"").length }
+            y={yX} 
+            width={50} 
+            height={50}
+        />
     )
     return <g>
         {result}

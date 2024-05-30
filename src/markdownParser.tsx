@@ -11,14 +11,14 @@ import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 type Props = {
   text: string;
+  className?:string
 };
-
-export default function MarkdownParser({ text }: Props) {
+export default function MarkdownParser({ text,className = ""}: Props) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkMath, remarkGfm]}
       rehypePlugins={[rehypeKatex]}
-      className="markdown"
+      className={`markdown ${className}`}
       components={{
         table: ({ node, ...props }) => (
           <table style={{ border: "1px solid", margin: "auto" }} {...props} />
