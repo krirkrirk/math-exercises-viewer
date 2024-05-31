@@ -92,7 +92,8 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
 
   const [latex, setLatex] = useState("");
   const [veaResult, setVeaResult] = useState<boolean>();
-  const [hint,setHint] = useState("")
+  const [hint,setHint] = useState("");
+  const [correction,setCorrection] = useState("");
   useEffect(() => {
     setVeaResult(undefined);
   }, [latex]);
@@ -115,10 +116,6 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       })
       .catch((err) => console.log(err));
   };
-
-  const updateHint =  ()=> {
-
-  }
 
   const mathfieldRef = useRef<any>();
   const onCopyLatex = () => {
@@ -156,6 +153,12 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         <>
           <button className="border mx-3" onClick={()=>hint==="" ? setHint(question.hint!) : setHint("")}>Indice!</button>
           <MarkdownParser text={hint}></MarkdownParser>
+        </>
+      )}
+      {question?.correction && (
+        <>
+          <button className="border mx-3" onClick={()=>correction==="" ? setCorrection(question.correction!) : setCorrection("")}>Correction !</button>
+          <MarkdownParser text={correction}></MarkdownParser>
         </>
       )}
       {question?.propositions && (
