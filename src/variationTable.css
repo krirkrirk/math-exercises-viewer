@@ -1,0 +1,14 @@
+.value-group:hover .remove-button {
+  display: block;
+}
+
+.remove-button {
+  display: none;
+  font-size: 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 2px 5px;
+}
