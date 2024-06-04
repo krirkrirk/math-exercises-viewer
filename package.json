@@ -22,7 +22,9 @@
     "react-syntax-highlighter": "^15.5.0",
     "rehype-katex": "^6.0.2",
     "remark-gfm": "^3.0.1",
-    "remark-math": "^5.1.1"
+    "remark-math": "^5.1.1",
+    "uuid": "^9.0.1",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",

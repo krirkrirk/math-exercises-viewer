@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { Exercise, Question } from "./types";
-import MathInput from "react-math-keyboard";
 import MarkdownParser from "./markdownParser";
 import { QuestionDisplay } from "./questionDisplay";
 import { GeneratorsList } from "./generatorsList";
 import { GeneratorsListByLevel } from "./generatorsListByLevel";
 import { GeneratorsListBySection } from "./generatorsListBySection";
 import { SignTableAnswer } from "./signTableAnswer";
+import { uuid } from "uuidv4";
+import { v4 } from "uuid";
 
 function App() {
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
