@@ -14,6 +14,9 @@ type Props = {
 };
 
 export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
+  const [showHint, setShowHint] = useState(false);
+  const [showCorrection, setShowCorrection] = useState(false);
+
   const appletOnLoad = (app: any) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
@@ -127,6 +130,32 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
         <MarkdownParser text={question.instruction}></MarkdownParser>
+      )}
+      {question.hint && (
+        <div>
+          <button
+            onClick={() => setShowHint(!showHint)}
+            className="border mb-2"
+          >
+            {showHint ? "Masquer l'indice" : "Afficher l'indice"}
+          </button>
+          {showHint && <MarkdownParser text={question.hint}></MarkdownParser>}
+        </div>
+      )}
+      {question.correction && (
+        <div>
+          <button
+            onClick={() => setShowCorrection(!showCorrection)}
+            className="border mb-2"
+          >
+            {showCorrection
+              ? "Masquer la correction"
+              : "Afficher la correction"}
+          </button>
+          {showCorrection && (
+            <MarkdownParser text={question.correction}></MarkdownParser>
+          )}
+        </div>
       )}
 
       {question.startStatement && (
