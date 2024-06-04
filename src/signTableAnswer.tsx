@@ -3,7 +3,6 @@ import { LatexInSVG } from "./latexInSvg";
 import MarkdownParser from "./markdownParser";
 import { v4 } from "uuid";
 import { FunctionVariations, Variation } from "./types";
-import MathInput from "react-math-keyboard";
 
 type Props = {
   width:number,
@@ -30,8 +29,9 @@ const inputStyle = {
 }
 
 
-
 const Dimensions = createContext({width:0,height:0,xTabHeight:0,fTabHeight:0,xTabWidth:0})
+
+
 
 export const SignTableAnswer = ({width, height}: Props) => {
     const xTabHeight = Math.floor(height/2-10);
@@ -94,7 +94,8 @@ export const SignTableAnswer = ({width, height}: Props) => {
                 
             </Dimensions.Provider>
         </svg>
-        <button style={{width:"max-content"}}onClick={exportSvgSignTableData} type="submit">Recupere Données !</button>
+
+        <button style={{width:"max-content"}} onClick={exportSvgSignTableData} type="submit">Recupere Données !</button>
         </div> 
 };
 
@@ -176,27 +177,6 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
         return elements
     }
 
-
-    
-    result.push(
-        <foreignObject key={v4()} x={xX} y={yX} width={50} height={25}>
-            <form onSubmit={(e)=>{
-                e.preventDefault()
-                //@ts-ignore
-                setStart(()=>e.target[0].value)
-                }}>
-                <input style={inputStyle} defaultValue={start}></input>
-            </form>
-        </foreignObject>,
-        <foreignObject key={v4()} x={xX+xXStep/2-8} y={ySign}color="black" width={50} height={50}>
-            <button onClick={()=>{
-                setStartSign((prev)=>prev === "+" ? "-" : "+")
-            }}>
-                <MarkdownParser text={`$${startSign}$`}></MarkdownParser>
-            </button>
-        </foreignObject>
-    )
-
     variations.forEach((value,index)=>{
         xX = xX + xXStep
         result = result.concat(
@@ -205,7 +185,32 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
         ) 
     })
 
-    result.push(
+
+
+    return (
+    <g>
+        <foreignObject 
+        key={v4()} 
+        x={xX} y={yX} 
+        width={50} height={25}>
+            <form onSubmit={(e)=>{
+                e.preventDefault()
+                //@ts-ignore
+                setStart(()=>e.target[0].value)
+                }}>
+                <input style={inputStyle} defaultValue={start}></input>
+            </form>
+        </foreignObject>,
+        <foreignObject 
+            key={v4()} x={xX+xXStep/2-8} 
+            y={ySign}color="black" width={50} height={50}>
+                <button onClick={()=>{
+                    setStartSign((prev)=>prev === "+" ? "-" : "+")
+                }}>
+                    <MarkdownParser text={`$${startSign}$`}></MarkdownParser>
+                </button>
+        </foreignObject>
+        {result}
         <foreignObject
             key={v4()}
             x={dim.width-30} 
@@ -217,13 +222,9 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
                     >
                     <input style={inputStyle} defaultValue={end}></input>
                 </form>
-        </foreignObject>
-    );
-
-
-    return <g>
-        {result}            
+        </foreignObject>        
     </g>
+    )
 
 };
 
