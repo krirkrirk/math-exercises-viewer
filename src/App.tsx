@@ -16,6 +16,10 @@ function App() {
   const [prevExoId, setPrevExoId] = useState("");
   const [nextExoId, setNextExoId] = useState("");
   const [exoCount, setExoCount] = useState(0);
+  const [xValues, setXValues] = useState<number[]>([]);
+  const [fValues, setFValues] = useState<number[]>([]);
+  const [inputValue, setInputValue] = useState<number | string>("");
+
   const onSelect = (exoId: string) => {
     window.location.href = `/exo?exoId=${exoId}`;
   };
@@ -74,8 +78,93 @@ function App() {
     onSelect(prevExoId);
   };
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setInputValue(value);
+  };
+
+  const addXValue = () => {
+    const newValue = parseFloat(inputValue as string);
+    if (!isNaN(newValue)) {
+      setXValues([...xValues, newValue]);
+      setInputValue("");
+    }
+  };
+
+  const addFValue = () => {
+    const newValue = parseFloat(inputValue as string);
+    if (!isNaN(newValue)) {
+      setFValues([...fValues, newValue]);
+      setInputValue("");
+    }
+  };
+
+  const resetValues = () => {
+    setXValues([]);
+    setFValues([]);
+  };
+
   return (
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
+      <VariationTable xValues={xValues} fValues={fValues} />
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="Entrez la valeur"
+          style={{
+            marginRight: "10px",
+            padding: "5px",
+            color: "black",
+            fill: "white",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            outline: "none",
+          }}
+        />
+        <button
+          onClick={addXValue}
+          style={{
+            marginRight: "10px",
+            padding: "5px 10px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Add x Value
+        </button>
+        <button
+          onClick={addFValue}
+          style={{
+            marginRight: "10px",
+            padding: "5px 10px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Add f(x) Value
+        </button>
+        <button
+          onClick={resetValues}
+          style={{
+            padding: "5px 10px",
+            backgroundColor: "#dc3545",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Reset
+        </button>
+      </div>
       {!!allExercises.length && (
         <div>
           <p>{exoCount} Générateurs</p>
