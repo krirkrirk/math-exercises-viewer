@@ -2,6 +2,7 @@ import { createContext, memo, useContext, useMemo, useState } from "react";
 import { LatexInSVG } from "./latexInSvg";
 import MarkdownParser from "./markdownParser";
 import { v4 } from "uuid";
+import { FunctionVariations, Variation } from "./types";
 
 type Props = {
   width:number,
@@ -11,10 +12,10 @@ type Props = {
 type States = {
     start:string,
     setStart:React.Dispatch<React.SetStateAction<string>>
-    startSign:string,
     end:string,
     setEnd:React.Dispatch<React.SetStateAction<string>>,
-    setStartSign:React.Dispatch<React.SetStateAction<string>>,
+    startSign:string,
+    setStartSign:React.Dispatch<React.SetStateAction<"+"|"-">>,
     variations:string[],
     setVariations:React.Dispatch<React.SetStateAction<string[]>>,
     variationsSign:string[],
@@ -26,6 +27,8 @@ const inputStyle = {
     width:25,
     outline:"0"
 }
+
+
 
 const Dimensions = createContext({width:0,height:0,xTabHeight:0,fTabHeight:0,xTabWidth:0})
 
@@ -39,7 +42,7 @@ export const SignTableAnswer = ({width, height}: Props) => {
 
     const [start,setStart] = useState<string>("-15");
 
-    const [startSign,setStartSign] = useState("+");
+    const [startSign,setStartSign] = useState<"+"|"-">("+");
 
     const [end,setEnd] = useState<string>("15");
 
@@ -48,15 +51,29 @@ export const SignTableAnswer = ({width, height}: Props) => {
     const [variationsSign, setVariationsSign] = useState<string[]>([]);
 
 
+    function returnData():FunctionVariations{
+        const variationsResult: Variation[] = []
+        for (let i=0; i<variations.length; i++){
+            const variation = variations[i];
+            const sign = variationsSign[i] as ("+"|"-");
+            const variationFormat = {changePoint:{latexValue:variation,mathValue:+variation},sign}
+            variationsResult.push(variationFormat)
+        }
+        return {
+            start:{latexValue:start,mathValue:+start},
+            startSign: startSign as ("+"|"-"),
+            end:{latexValue:end,mathValue:+end},
+            variations:variationsResult
+        }
+    }
+
 
     function handleAddVariation() {
-        setVariations((prev)=>{
-            return prev.concat("0")
-        })
-        setVariationsSign((prev)=>{
-            return prev.concat("+")
-        })
+        setVariations((prev)=>prev.concat("0"))
+        setVariationsSign((prev)=>prev.concat("+"))
     }
+
+
 
     return <div style={{display:"flex", flexDirection:"column"}}>
 
@@ -76,13 +93,16 @@ export const SignTableAnswer = ({width, height}: Props) => {
                 setVariationsSign={setVariationsSign}></VariationsDisplay>
             </Dimensions.Provider>
         </svg>
+
+        <button style={{width:"max-content"}}onClick={returnData} type="submit">Recupere Données !</button>
         </div> 
 };
 
 
 
 const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
-    variations,setVariations,variationsSign,setVariationsSign}:States) => {    
+    variations,setVariations,variationsSign,setVariationsSign}:States) => { 
+
     const dim = useContext(Dimensions)
     let result : JSX.Element[] = [];
     const ySign = dim.xTabHeight/2+dim.xTabHeight-10;
@@ -121,6 +141,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
                         e.preventDefault()
                         setVariations((prev)=>{
                             const cpy = prev.slice()
+                            //@ts-ignore
                             cpy[variationIndex] = e.target[0].value
                             return cpy
                         })
@@ -161,6 +182,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
         <foreignObject key={v4()} x={xX} y={yX} width={50} height={25}>
             <form onSubmit={(e)=>{
                 e.preventDefault()
+                //@ts-ignore
                 setStart(()=>e.target[0].value)
                 }}>
                 <input style={inputStyle} defaultValue={start}></input>
@@ -174,27 +196,30 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
             </button>
         </foreignObject>
     )
-    for (let i = 0; i<variations.length ; i++){
+
+    variations.forEach((value,index)=>{
         xX = xX + xXStep
         result = result.concat(
-            getVariationXJSXElements(i,xX,yX),
-            getSignVaraiationJSXElements(i,xX,ySign,xXStep)
+            getVariationXJSXElements(index,xX,yX),
+            getSignVaraiationJSXElements(index,xX,ySign,xXStep)
         ) 
-    }
-
+    })
 
     result.push(
-    <foreignObject
-        key={v4()}
-        x={dim.width-30} 
-        y={yX} width={50} height={25}>
-             <form onSubmit={(e)=>{
-                e.preventDefault()
-                setEnd(()=>e.target[0].value)
-                }}>
-                <input style={inputStyle} defaultValue={end}></input>
-            </form>
-    </foreignObject>)
+        <foreignObject
+            key={v4()}
+            x={dim.width-30} 
+            y={yX} width={50} height={25}>
+                <form onSubmit={(e)=>{
+                    console.log(e)
+                    e.preventDefault()
+                    //@ts-ignore
+                    setEnd(()=>e.target[0].value)
+                    }}>
+                    <input style={inputStyle} defaultValue={end}></input>
+                </form>
+        </foreignObject>
+    );
 
 
     return <g>
