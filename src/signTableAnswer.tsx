@@ -3,6 +3,8 @@ import { LatexInSVG } from "./latexInSvg";
 import MarkdownParser from "./markdownParser";
 import { v4 } from "uuid";
 import { FunctionVariations, Variation } from "./types";
+import MathInput from "react-math-keyboard";
+import { createPortal } from "react-dom";
 
 type Props = {
   width:number,
@@ -93,8 +95,9 @@ export const SignTableAnswer = ({width, height}: Props) => {
                 setVariationsSign={setVariationsSign}></VariationsDisplay>
             </Dimensions.Provider>
         </svg>
-
         <button style={{width:"max-content"}}onClick={returnData} type="submit">Recupere Données !</button>
+        <MathInput setValue={setEnd} forbidOtherKeyboardKeys={true} >
+                </MathInput>
         </div> 
 };
 
@@ -214,8 +217,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
                     console.log(e)
                     e.preventDefault()
                     //@ts-ignore
-                    setEnd(()=>e.target[0].value)
-                    }}>
+                    setEnd(()=>e.target[0].value)}}>
                     <input style={inputStyle} defaultValue={end}></input>
                 </form>
         </foreignObject>
