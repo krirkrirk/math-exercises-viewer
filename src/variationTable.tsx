@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./variationTable.css"; // Assurez-vous d'importer le fichier CSS
+import "./variationTable.css";
 
 type VariationTableProps = {
   xValues: number[];
@@ -7,7 +7,7 @@ type VariationTableProps = {
 };
 
 const WIDTH = 800;
-const HEIGHT = 300; // Increase height to accommodate buttons
+const HEIGHT = 300;
 const HEADER_HEIGHT = 50;
 const TEXT_Y_OFFSET = 25;
 const FX_Y_OFFSET = 75;
@@ -21,9 +21,8 @@ const VariationTable: React.FC<VariationTableProps> = ({
 }) => {
   const [xVals, setXVals] = useState<number[]>(xValues);
   const [fVals, setFVals] = useState<number[]>(fValues);
-  const [inputValue, setInputValue] = useState<number | string>("");
 
-  const xStep = WIDTH / (xVals.length + 1);
+  const xStep = WIDTH / (xVals.length + 2);
   const initialYPosition = fVals[0] > fVals[1] ? Y_TOP : Y_BOTTOM;
 
   const getYPosition = (index: number) => {
@@ -37,25 +36,9 @@ const VariationTable: React.FC<VariationTableProps> = ({
       : Y_TOP;
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setInputValue(value);
-  };
-
-  const addXValue = () => {
-    const newValue = parseFloat(inputValue as string);
-    if (!isNaN(newValue)) {
-      setXVals([...xVals, newValue]);
-      setInputValue("");
-    }
-  };
-
-  const addFValue = () => {
-    const newValue = parseFloat(inputValue as string);
-    if (!isNaN(newValue)) {
-      setFVals([...fVals, newValue]);
-      setInputValue("");
-    }
+  const addEmptyValues = () => {
+    setXVals([...xVals, NaN]);
+    setFVals([...fVals, NaN]);
   };
 
   const resetValues = () => {
@@ -65,11 +48,20 @@ const VariationTable: React.FC<VariationTableProps> = ({
 
   const removeXValue = (index: number) => {
     const newXVals = xVals.filter((_, i) => i !== index);
+    const newFVals = fVals.filter((_, i) => i !== index);
+    setXVals(newXVals);
+    setFVals(newFVals);
+  };
+
+  const handleXValueChange = (index: number, value: string) => {
+    const newXVals = [...xVals];
+    newXVals[index] = parseFloat(value);
     setXVals(newXVals);
   };
 
-  const removeFValue = (index: number) => {
-    const newFVals = fVals.filter((_, i) => i !== index);
+  const handleFValueChange = (index: number, value: string) => {
+    const newFVals = [...fVals];
+    newFVals[index] = parseFloat(value);
     setFVals(newFVals);
   };
 
@@ -113,64 +105,65 @@ const VariationTable: React.FC<VariationTableProps> = ({
           f(x)
         </text>
         {xVals.map((x, index) => {
-          const xPos = (index + 1) * xStep;
+          const xPosAdjustment = 12.5 * (xVals.length - 2);
+          const xPos = (index + 1) * xStep - xPosAdjustment;
           const yPosCurrent = getYPosition(index);
 
           return (
             <React.Fragment key={index}>
               {/* Valeurs de x */}
               <g className="value-group">
-                <text
-                  x={xPos + xStep / 2}
-                  y={TEXT_Y_OFFSET}
-                  fontSize="12"
-                  textAnchor="middle"
-                >
-                  {x}
-                </text>
                 <foreignObject
-                  x={xPos + xStep / 2 + 10}
-                  y={TEXT_Y_OFFSET - 10}
-                  width="20"
-                  height="20"
+                  x={xPos + 75 - xPosAdjustment}
+                  y={TEXT_Y_OFFSET - 15}
+                  width="50"
+                  height="30"
                 >
-                  <button
-                    onClick={() => removeXValue(index)}
-                    className="remove-button"
-                  >
-                    X
-                  </button>
+                  <div className="value-container">
+                    <input
+                      type="text"
+                      value={isNaN(x) ? "" : x}
+                      onChange={(e) =>
+                        handleXValueChange(index, e.target.value)
+                      }
+                      className="value-input"
+                      style={{ color: "black", width: "20px" }}
+                    />
+                    <button
+                      onClick={() => removeXValue(index)}
+                      className="remove-button"
+                    >
+                      X
+                    </button>
+                  </div>
                 </foreignObject>
               </g>
               {/* Valeurs de f(x) */}
               <g className="value-group">
-                <text
-                  x={xPos + xStep / 2}
-                  y={yPosCurrent + FX_Y_OFFSET}
-                  fontSize="12"
-                  textAnchor="middle"
-                >
-                  {fVals[index]}
-                </text>
                 <foreignObject
-                  x={xPos + xStep / 2 + 10}
-                  y={yPosCurrent + FX_Y_OFFSET - 10}
-                  width="20"
-                  height="20"
+                  x={xPos + 75 - xPosAdjustment}
+                  y={yPosCurrent + FX_Y_OFFSET - 15}
+                  width="50"
+                  height="30"
                 >
-                  <button
-                    onClick={() => removeFValue(index)}
-                    className="remove-button"
-                  >
-                    X
-                  </button>
+                  <div className="value-container">
+                    <input
+                      type="text"
+                      value={isNaN(fVals[index]) ? "" : fVals[index]}
+                      onChange={(e) =>
+                        handleFValueChange(index, e.target.value)
+                      }
+                      className="value-input"
+                      style={{ color: "black", width: "20px" }}
+                    />
+                  </div>
                 </foreignObject>
               </g>
               {index < xVals.length - 1 && (
                 <line
                   x1={xPos + xStep / 2 + OFFSET}
                   y1={yPosCurrent + FX_Y_OFFSET}
-                  x2={xPos + xStep + xStep / 2 - OFFSET}
+                  x2={xPos + xStep + xStep / 2 - OFFSET - 20}
                   y2={getYPosition(index + 1) + FX_Y_OFFSET}
                   stroke="black"
                   markerEnd="url(#arrow)"
@@ -179,6 +172,31 @@ const VariationTable: React.FC<VariationTableProps> = ({
             </React.Fragment>
           );
         })}
+        <foreignObject
+          x={(xVals.length + 1) * xStep - 15}
+          y={TEXT_Y_OFFSET - 15}
+          width="30"
+          height="30"
+        >
+          <button
+            onClick={addEmptyValues}
+            className="add-button"
+            style={{
+              width: "30px",
+              height: "30px",
+              backgroundColor: "#28a745",
+              border: "none",
+              borderRadius: "50%",
+              color: "white",
+              fontSize: "20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            +
+          </button>
+        </foreignObject>
         <defs>
           <marker
             id="arrow"
@@ -200,48 +218,6 @@ const VariationTable: React.FC<VariationTableProps> = ({
           justifyContent: "center",
         }}
       >
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          placeholder="Entrez la valeur"
-          style={{
-            marginRight: "10px",
-            padding: "5px",
-            color: "black",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            outline: "none",
-          }}
-        />
-        <button
-          onClick={addXValue}
-          style={{
-            marginRight: "10px",
-            padding: "5px 10px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Add x Value
-        </button>
-        <button
-          onClick={addFValue}
-          style={{
-            marginRight: "10px",
-            padding: "5px 10px",
-            backgroundColor: "#28a745",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Add f(x) Value
-        </button>
         <button
           onClick={resetValues}
           style={{

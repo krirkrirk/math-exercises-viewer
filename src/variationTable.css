@@ -1,3 +1,17 @@
+.value-input {
+  width: 100%;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  padding: 2px;
+  text-align: center;
+}
+
+.value-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .value-group:hover .remove-button {
   display: block;
 }
@@ -11,4 +25,15 @@
   border-radius: 4px;
   cursor: pointer;
   padding: 2px 5px;
+  margin-left: 5px;
+}
+
+.add-button {
+  font-size: 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px;
 }
