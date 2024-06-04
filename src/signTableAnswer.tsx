@@ -8,6 +8,19 @@ type Props = {
   height:number
 };
 
+type Test = {
+    start:string,
+    setStart:React.Dispatch<React.SetStateAction<string>>
+    startSign:string,
+    end:string,
+    setEnd:React.Dispatch<React.SetStateAction<string>>,
+    setStartSign:React.Dispatch<React.SetStateAction<string>>,
+    variations:string[],
+    setVariations:React.Dispatch<React.SetStateAction<string[]>>,
+    variationsSign:string[],
+    setVariationsSign:React.Dispatch<React.SetStateAction<string[]>>;
+}
+
 const inputStyle = {
     color:"black",
     outline:"0"
@@ -30,110 +43,6 @@ export const SignTableAnswer = ({width, height}: Props) => {
     const [variations, setVariations] = useState<string[]>([]);
     const [variationsSign, setVariationsSign] = useState<string[]>([])
 
-
-    const VariationsDisplay = () => {
-
-
-        let uniqueKey = 0;
-    
-        
-        let result : JSX.Element[] = [];
-        const ySign = fTabHeight/2+xTabHeight-10;
-        const yX = xTabHeight/2-15;
-    
-        let xX = xTabWidth+10;    
-        let xXStep = Math.floor((width-15-xX)/(1+variations.length));
-
-
-        
-        result.push(
-            <foreignObject key={v4()} x={xX} y={yX} width={50} height={25}>
-                <form onSubmit={(e)=>{
-                    e.preventDefault()
-                    setStart(()=>e.target[0].value)
-                    }}>
-                    <input style={inputStyle} defaultValue={start}></input>
-                </form>
-            </foreignObject>,
-            <foreignObject key={v4()} x={xX+xXStep/2-8} y={ySign}color="black" width={50} height={50}>
-                <button onClick={()=>{
-                    setStartSign((prev)=>prev ==="+" ? "-" : "+")
-                }}>
-                    <MarkdownParser text={`$${startSign}$`}></MarkdownParser>
-                </button>
-            </foreignObject>
-        )
-        for (let i = 0; i<variations.length ; i++){
-            xX = xX + xXStep
-            result = result.concat(
-                getVariationXJSXElements(uniqueKey,i,xX,yX),
-                getSignVaraiationJSXElements(uniqueKey,i,xX,ySign,xXStep)
-            ) 
-        }
-
-
-        result.push(
-        <foreignObject
-            key={v4()}
-            x={width-30} 
-            y={yX} width={50} height={25}>
-                 <form onSubmit={(e)=>{
-                    e.preventDefault()
-                    setEnd(()=>e.target[0].value)
-                    }}>
-                    <input style={inputStyle} defaultValue={end}></input>
-                </form>
-        </foreignObject>)
-    
-        return <g>
-            {result}            
-        </g>
-    
-    }
-    
-    const getVariationXJSXElements = (uniqueKey:number, variationIndex:number, xX:number,yX:number) : JSX.Element[]  => {
-        const elements = []
-        elements.push(
-            <foreignObject 
-            key={v4()} x={((variations[variationIndex]).length <=1) ? xX : xX - ((((+variations[variationIndex]).toFixed(2)).length-1))} 
-            y={yX} width={50} height={25}
-            >
-                <form onSubmit={(e)=>{
-                    e.preventDefault()
-                    console.log("clicked",e.target[0].value)
-                    setVariations((prev)=>{
-                        const cpy = prev.slice()
-                        cpy[variationIndex] = e.target[0].value
-                        return cpy
-                    })
-                }}>
-                    <input style={inputStyle} defaultValue={variations[variationIndex]}></input>
-                </form>
-            </foreignObject>,
-            <line key={v4()} x1={xX+4.5} y1={xTabHeight} x2={xX+4.5} y2={height} stroke="black"></line>,
-        )
-        return elements
-    }
-    
-    const getSignVaraiationJSXElements = (uniqueKey:number, variationSignIndex:number,xX:number,ySign:number,xXStep:number) : JSX.Element[] => {
-        const elements : JSX.Element[] = []
-        
-        elements.push(<LatexInSVG key={v4()} latex={`$0$`} x={xX} y={ySign} width={50} height={25}/>)
-    
-        elements.push(
-        <foreignObject key={v4()} x={xX+xXStep/2-8} y={ySign} color="black" width={50} height={50} >
-            <button onClick={()=>{
-            setVariationsSign((prev)=>{
-                const currSign = variationsSign[variationSignIndex]
-                const copy:string[] = [...prev]
-                copy[variationSignIndex] = (currSign === "+") ? "-" : "+"
-                return copy
-            })}}><MarkdownParser text={`$${variationsSign[variationSignIndex]}$`}></MarkdownParser></button>
-        </foreignObject>,
-    )
-    
-        return elements
-    }
 
 
     function handleAddVariation() {
@@ -169,7 +78,15 @@ export const SignTableAnswer = ({width, height}: Props) => {
         <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} style={{margin:0}}>
             <Dimensions.Provider value={{width,height,xTabHeight,fTabHeight,xTabWidth}}>
                 <VariationTab/>
-                <VariationsDisplay></VariationsDisplay>
+                <VariationsDisplay start={start} setStart={setStart} 
+                startSign={startSign} 
+                setStartSign={setStartSign} 
+                end={end} 
+                setEnd={setEnd} 
+                variations={variations} 
+                setVariations={setVariations} 
+                variationsSign={variationsSign} 
+                setVariationsSign={setVariationsSign}></VariationsDisplay>
             </Dimensions.Provider>
         </svg>
         Supprimer une Variation :
@@ -181,6 +98,110 @@ export const SignTableAnswer = ({width, height}: Props) => {
     </div>
 
 };
+
+const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,variations,setVariations,variationsSign,setVariationsSign}:Test) => {    
+    const dim = useContext(Dimensions)
+    let result : JSX.Element[] = [];
+    const ySign = dim.xTabHeight/2+dim.xTabHeight-10;
+    const yX = dim.xTabHeight/2-15;
+
+    let xX = dim.xTabWidth+10;    
+    let xXStep = Math.floor((dim.width-15-xX)/(1+variations.length));
+
+
+    const getVariationXJSXElements = (variationIndex:number, xX:number,yX:number) : JSX.Element[]  => {
+        const elements = []
+        elements.push(
+            <foreignObject 
+            key={v4()} x={((variations[variationIndex]).length <=1) ? xX : xX - ((((+variations[variationIndex]).toFixed(2)).length-1))} 
+            y={yX} width={50} height={25}
+            >
+                <form onSubmit={(e)=>{
+                    e.preventDefault()
+                    console.log("clicked",e.target[0].value)
+                    setVariations((prev)=>{
+                        const cpy = prev.slice()
+                        cpy[variationIndex] = e.target[0].value
+                        return cpy
+                    })
+                }}>
+                    <input style={inputStyle} defaultValue={variations[variationIndex]}></input>
+                </form>
+            </foreignObject>,
+            <line key={v4()} x1={xX+4.5} y1={dim.xTabHeight} x2={xX+4.5} y2={dim.height} stroke="black"></line>,
+        )
+        return elements
+    }
+    
+    const getSignVaraiationJSXElements = (variationSignIndex:number,xX:number,ySign:number,xXStep:number) : JSX.Element[] => {
+        const elements : JSX.Element[] = []
+        
+        elements.push(<LatexInSVG key={v4()} latex={`$0$`} x={xX} y={ySign} width={50} height={25}/>)
+    
+        elements.push(
+        <foreignObject key={v4()} x={xX+xXStep/2-8} y={ySign} color="black" width={50} height={50} >
+            <button onClick={()=>{
+            setVariationsSign((prev)=>{
+                const currSign = variationsSign[variationSignIndex]
+                const copy:string[] = [...prev]
+                copy[variationSignIndex] = (currSign === "+") ? "-" : "+"
+                return copy
+            })}}><MarkdownParser text={`$${variationsSign[variationSignIndex]}$`}></MarkdownParser></button>
+        </foreignObject>,
+    )
+    
+        return elements
+    }
+
+
+    
+    result.push(
+        <foreignObject key={v4()} x={xX} y={yX} width={50} height={25}>
+            <form onSubmit={(e)=>{
+                e.preventDefault()
+                setStart(()=>e.target[0].value)
+                }}>
+                <input style={inputStyle} defaultValue={start}></input>
+            </form>
+        </foreignObject>,
+        <foreignObject key={v4()} x={xX+xXStep/2-8} y={ySign}color="black" width={50} height={50}>
+            <button onClick={()=>{
+                setStartSign((prev)=>prev ==="+" ? "-" : "+")
+            }}>
+                <MarkdownParser text={`$${startSign}$`}></MarkdownParser>
+            </button>
+        </foreignObject>
+    )
+    for (let i = 0; i<variations.length ; i++){
+        xX = xX + xXStep
+        result = result.concat(
+            getVariationXJSXElements(i,xX,yX),
+            getSignVaraiationJSXElements(i,xX,ySign,xXStep)
+        ) 
+    }
+
+
+    result.push(
+    <foreignObject
+        key={v4()}
+        x={dim.width-30} 
+        y={yX} width={50} height={25}>
+             <form onSubmit={(e)=>{
+                e.preventDefault()
+                setEnd(()=>e.target[0].value)
+                }}>
+                <input style={inputStyle} defaultValue={end}></input>
+            </form>
+    </foreignObject>)
+
+
+    return <g>
+        {result}            
+    </g>
+
+}
+
+
 
 const VariationTab = () => {
     const dim = useContext(Dimensions)
