@@ -1,10 +1,9 @@
-import { createContext, memo, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { LatexInSVG } from "./latexInSvg";
 import MarkdownParser from "./markdownParser";
 import { v4 } from "uuid";
 import { FunctionVariations, Variation } from "./types";
 import MathInput from "react-math-keyboard";
-import { createPortal } from "react-dom";
 
 type Props = {
   width:number,
@@ -93,11 +92,10 @@ export const SignTableAnswer = ({width, height}: Props) => {
                 setVariations={setVariations} 
                 variationsSign={variationsSign} 
                 setVariationsSign={setVariationsSign}></VariationsDisplay>
+                
             </Dimensions.Provider>
         </svg>
         <button style={{width:"max-content"}}onClick={returnData} type="submit">Recupere Données !</button>
-        <MathInput setValue={setEnd} forbidOtherKeyboardKeys={true} >
-                </MathInput>
         </div> 
 };
 
@@ -131,7 +129,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
         })
     }
 
-    const getVariationXJSXElements = (variationIndex:number, xX:number,yX:number) : JSX.Element[]  => {
+    const getVariationJSXElements = (variationIndex:number, xX:number,yX:number) : JSX.Element[]  => {
         const elements = []
         const correctX = ((variations[variationIndex]).length <=1) ? xX : xX - ((((+variations[variationIndex]).toFixed(2)).length-1))
         elements.push(
@@ -203,7 +201,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
     variations.forEach((value,index)=>{
         xX = xX + xXStep
         result = result.concat(
-            getVariationXJSXElements(index,xX,yX),
+            getVariationJSXElements(index,xX,yX),
             getSignVaraiationJSXElements(index,xX,ySign,xXStep)
         ) 
     })
