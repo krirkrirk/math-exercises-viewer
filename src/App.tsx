@@ -78,7 +78,7 @@ function App() {
   };
   return (
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
-      <SignTableAnswer width={300} height={150}></SignTableAnswer>
+      <SignTableAnswer width={600} height={150}></SignTableAnswer>
       {!!allExercises.length && (
         <div>
           <p>{exoCount} Générateurs</p>
