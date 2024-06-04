@@ -21,7 +21,7 @@ type States = {
     variations:string[],
     setVariations:React.Dispatch<React.SetStateAction<string[]>>,
     variationsSign:string[],
-    setVariationsSign:React.Dispatch<React.SetStateAction<string[]>>;
+    setVariationsSign:React.Dispatch<React.SetStateAction<("+"|"-")[]>>;
 }
 
 const inputStyle = {
@@ -50,20 +50,20 @@ export const SignTableAnswer = ({width, height}: Props) => {
 
 
     const [variations, setVariations] = useState<string[]>([]);
-    const [variationsSign, setVariationsSign] = useState<string[]>([]);
+    const [variationsSign, setVariationsSign] = useState<("+"|"-")[]>([]);
 
 
     function returnData():FunctionVariations{
         const variationsResult: Variation[] = []
         for (let i=0; i<variations.length; i++){
             const variation = variations[i];
-            const sign = variationsSign[i] as ("+"|"-");
+            const sign = variationsSign[i];
             const variationFormat = {changePoint:{latexValue:variation,mathValue:+variation},sign}
             variationsResult.push(variationFormat)
         }
         return {
             start:{latexValue:start,mathValue:+start},
-            startSign: startSign as ("+"|"-"),
+            startSign,
             end:{latexValue:end,mathValue:+end},
             variations:variationsResult
         }
@@ -123,7 +123,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
             return result
         })
         setVariationsSign((prev)=>{
-            const result:string[] = []
+            const result:("+"|"-")[] = []
             prev.forEach((value,i)=>{
                 if (i !== index) result.push(value)
             })
@@ -169,7 +169,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
             <button onClick={()=>{
             setVariationsSign((prev)=>{
                 const currSign = variationsSign[variationSignIndex]
-                const copy:string[] = [...prev]
+                const copy:("+"|"-")[]= [...prev]
                 copy[variationSignIndex] = (currSign === "+") ? "-" : "+"
                 return copy
             })}}><MarkdownParser text={`$${variationsSign[variationSignIndex]}$`}></MarkdownParser></button>
@@ -214,10 +214,10 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
             x={dim.width-30} 
             y={yX} width={50} height={25}>
                 <form onSubmit={(e)=>{
-                    console.log(e)
                     e.preventDefault()
                     //@ts-ignore
-                    setEnd(()=>e.target[0].value)}}>
+                    setEnd(()=>e.target[0].value)}}
+                    >
                     <input style={inputStyle} defaultValue={end}></input>
                 </form>
         </foreignObject>
