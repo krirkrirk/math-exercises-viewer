@@ -8,7 +8,7 @@ type Props = {
   height:number
 };
 
-type Test = {
+type States = {
     start:string,
     setStart:React.Dispatch<React.SetStateAction<string>>
     startSign:string,
@@ -99,7 +99,8 @@ export const SignTableAnswer = ({width, height}: Props) => {
 
 };
 
-const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,variations,setVariations,variationsSign,setVariationsSign}:Test) => {    
+const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
+    variations,setVariations,variationsSign,setVariationsSign}:States) => {    
     const dim = useContext(Dimensions)
     let result : JSX.Element[] = [];
     const ySign = dim.xTabHeight/2+dim.xTabHeight-10;
@@ -118,7 +119,6 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,var
             >
                 <form onSubmit={(e)=>{
                     e.preventDefault()
-                    console.log("clicked",e.target[0].value)
                     setVariations((prev)=>{
                         const cpy = prev.slice()
                         cpy[variationIndex] = e.target[0].value
@@ -148,7 +148,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,var
                 return copy
             })}}><MarkdownParser text={`$${variationsSign[variationSignIndex]}$`}></MarkdownParser></button>
         </foreignObject>,
-    )
+        )
     
         return elements
     }
