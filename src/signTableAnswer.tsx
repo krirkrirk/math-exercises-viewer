@@ -33,7 +33,6 @@ const inputStyle = {
 
 const Dimensions = createContext({width:0,height:0,xTabHeight:0,fTabHeight:0,xTabWidth:0})
 
-
 export const SignTableAnswer = ({width, height}: Props) => {
     const xTabHeight = Math.floor(height/2-10);
 
@@ -52,7 +51,7 @@ export const SignTableAnswer = ({width, height}: Props) => {
     const [variationsSign, setVariationsSign] = useState<("+"|"-")[]>([]);
 
 
-    function returnData():FunctionVariations{
+    function exportSvgSignTableData():FunctionVariations{
         const variationsResult: Variation[] = []
         for (let i=0; i<variations.length; i++){
             const variation = variations[i];
@@ -95,7 +94,7 @@ export const SignTableAnswer = ({width, height}: Props) => {
                 
             </Dimensions.Provider>
         </svg>
-        <button style={{width:"max-content"}}onClick={returnData} type="submit">Recupere Données !</button>
+        <button style={{width:"max-content"}}onClick={exportSvgSignTableData} type="submit">Recupere Données !</button>
         </div> 
 };
 
