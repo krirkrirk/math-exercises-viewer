@@ -1,5 +1,5 @@
 import MarkdownParser from "./markdownParser";
-import { Exercise, FunctionVariations, Question } from "./types";
+import { Exercise, FunctionSignVariations, Question } from "./types";
 import { useEffect, useRef, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
@@ -97,7 +97,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     setVeaResult(undefined);
   }, [latex]);
 
-  const [svgSignTableState, setSvgSignTableState] = useState<FunctionVariations>({
+  const [svgSignTableState, setSvgSignTableState] = useState<FunctionSignVariations>({
     start:{latexValue:"",mathValue:0},
     startSign:"+",
     end:{latexValue:"",mathValue:0},
@@ -146,8 +146,8 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         svgVeaProps : {svgSignTableAnswer:question.svgSignTableAnswer,...question.identifiers}
       })
     }).then((res)=>res.json()).then((res)=>{
-        console.log(res)
-        setSVGSignTableVea(res);
+        console.log(res.result)
+        setSVGSignTableVea(res.result);
     })
   }
 
@@ -169,7 +169,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
       <AnswerDisplay
-        answer={question.answer}
+        answer={(question.answer || question.svgSignTableAnswer)!}
         answerFormat={question.answerFormat ?? "tex"}
       />
       <div>
@@ -190,14 +190,14 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           ))}
         </>
       )}
-      {!isQCM && (
+      {!isQCM && exo.answerType!=="SVG" && (
         <>
           <p>Clavier : </p>
           <MathInput
             numericToolbarKeys={question.keys}
             setValue={setLatex}
             setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
-            //forbidOtherKeyboardKeys={true}
+            forbidOtherKeyboardKeys={true}
           />
           <p>
             bonne réponse officielle :{" "}
@@ -217,9 +217,9 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       )}
       {exo.answerType === "SVG" && (
         <div>
-          <SignTableAnswer width={300} height={150} setSvgState={setSvgSignTableState} extractDataButton={false}/>
+          <SignTableAnswer width={300} height={150} setSvgState={setSvgSignTableState} extractDataButton={false} options={question.svgSignTableOptions}/>
           <div className="mx-3">
-              <button onClick={() => checkSVGVea()} className="border mx-3">
+              <button onClick={checkSVGVea} className="border mx-3">
                 check svgVea
               </button>
               {svgSignTableVEA !== undefined && (

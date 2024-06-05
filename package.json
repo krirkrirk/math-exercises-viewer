@@ -18,7 +18,7 @@
     "react-dom": "^18.2.0",
     "react-katex": "^3.0.1",
     "react-markdown": "^8.0.7",
-    "react-math-keyboard": "^1.5.14",
+    "react-math-keyboard": "^1.5.16",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-katex": "^6.0.2",
     "remark-gfm": "^3.0.1",

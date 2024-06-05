@@ -18,8 +18,8 @@ export type Proposition = {
 export interface Question<TIdentifiers = {}> {
   instruction: string;
   startStatement?: string;
-  answer: string;
-  answerFormat: "tex" | "raw";
+  answer?: string;
+  answerFormat?: "tex" | "raw";
   svgSignTableAnswer?: string;
   keys?: KeyId[];
   commands?: string[];
@@ -34,10 +34,14 @@ export interface Question<TIdentifiers = {}> {
     is3D?: boolean;
     axisLabels?: string[];
   };
+  svgSignTableOptions?: {
+    start?: string;
+    end?: string;
+  };
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
   propositions?: Proposition[];
-  signTable?: FunctionVariations;
+  signTable?: FunctionSignVariations;
 }
 
 export type QCMGenerator<TIdentifiers> = (
@@ -111,7 +115,7 @@ export type Section =
   | "Équations différentielles"
   | "Trigonométrie";
 
-export type FunctionVariations = {
+export type FunctionSignVariations = {
   start: MathLatex;
   startSign: "-" | "+";
   end: MathLatex;
