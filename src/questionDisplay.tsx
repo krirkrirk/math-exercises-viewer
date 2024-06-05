@@ -1,10 +1,11 @@
 import MarkdownParser from "./markdownParser";
-import { Exercise, Question } from "./types";
+import { Exercise, FunctionVariations, Question } from "./types";
 import { useEffect, useRef, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
+import { SignTableAnswer } from "./signTableAnswer";
 
 type Props = {
   exo: Exercise;
@@ -95,6 +96,16 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
   useEffect(() => {
     setVeaResult(undefined);
   }, [latex]);
+
+  const [svgSignTableState, setSvgSignTableState] = useState<FunctionVariations>({
+    start:{latexValue:"",mathValue:0},
+    startSign:"+",
+    end:{latexValue:"",mathValue:0},
+    variations:[]
+  });
+  
+  const [svgSignTableVEA, setSVGSignTableVea] = useState<boolean>();
+
   const vea = (input: string) => {
     fetch(`http://localhost:5000/vea?exoId=${exo.id}`, {
       method: "POST",
@@ -116,10 +127,30 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
   };
 
   const mathfieldRef = useRef<any>();
+
   const onCopyLatex = () => {
     console.log(mathfieldRef.current);
     mathfieldRef.current.latex(question.answer);
   };
+
+
+  const checkSVGVea = () => {
+    fetch(`http://localhost:5000/svgSignTableVea?exoId=${exo.id}`,{
+      method:"POST",
+      headers:{
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        ans: JSON.stringify(svgSignTableState),
+        svgVeaProps : {svgSignTableAnswer:question.svgSignTableAnswer,...question.identifiers}
+      })
+    }).then((res)=>res.json()).then((res)=>{
+        console.log(res)
+        setSVGSignTableVea(res);
+    })
+  }
+
 
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
@@ -166,7 +197,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
             numericToolbarKeys={question.keys}
             setValue={setLatex}
             setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
-            forbidOtherKeyboardKeys={true}
+            //forbidOtherKeyboardKeys={true}
           />
           <p>
             bonne réponse officielle :{" "}
@@ -184,6 +215,20 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
         </>
       )}
+      {exo.answerType === "SVG" && (
+        <div>
+          <SignTableAnswer width={300} height={150} setSvgState={setSvgSignTableState} extractDataButton={false}/>
+          <div className="mx-3">
+              <button onClick={() => checkSVGVea()} className="border mx-3">
+                check svgVea
+              </button>
+              {svgSignTableVEA !== undefined && (
+                <span>{svgSignTableVEA ? "OK!" : "Non"}</span>
+              )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

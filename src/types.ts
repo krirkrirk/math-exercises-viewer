@@ -20,6 +20,7 @@ export interface Question<TIdentifiers = {}> {
   startStatement?: string;
   answer: string;
   answerFormat: "tex" | "raw";
+  svgSignTableAnswer?: string;
   keys?: KeyId[];
   commands?: string[];
   coords?: number[];
@@ -57,7 +58,7 @@ export interface Exercise<TIdentifiers = {}> {
   connector?: "=" | "\\iff" | "\\approx";
   generator: (n: number) => Question<TIdentifiers>[];
   maxAllowedQuestions?: number;
-  answerType?: "QCM" | "free";
+  answerType?: "QCM" | "free" | "SVG";
   qcmTimer: number;
   freeTimer: number;
   getPropositions?: QCMGenerator<{ answer: string } & TIdentifiers>;

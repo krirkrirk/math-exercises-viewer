@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { LatexInSVG } from "./latexInSvg";
 import MarkdownParser from "./markdownParser";
 import { v4 } from "uuid";
@@ -6,7 +6,9 @@ import { FunctionVariations, Variation } from "./types";
 
 type Props = {
   width:number,
-  height:number
+  height:number,
+  setSvgState?:React.Dispatch<React.SetStateAction<FunctionVariations>>,
+  extractDataButton?:boolean;
 };
 
 type States = {
@@ -33,7 +35,8 @@ const Dimensions = createContext({width:0,height:0,xTabHeight:0,fTabHeight:0,xTa
 
 
 
-export const SignTableAnswer = ({width, height}: Props) => {
+export const SignTableAnswer = ({width, height,setSvgState,extractDataButton}: Props) => {
+
     const xTabHeight = Math.floor(height/2-10);
 
     const fTabHeight = height - xTabHeight;
@@ -67,13 +70,18 @@ export const SignTableAnswer = ({width, height}: Props) => {
         }
     }
 
-
     function handleAddVariation() {
         setVariations((prev)=>prev.concat("0"))
         setVariationsSign((prev)=>prev.concat("+"))
     }
 
-
+    
+    useEffect(()=>{
+        if (setSvgState){
+            setSvgState(exportSvgSignTableData)
+        }
+    },[start,startSign,end,variations,variationsSign])
+    
 
     return <div style={{display:"flex", flexDirection:"column"}}>
 
@@ -94,8 +102,10 @@ export const SignTableAnswer = ({width, height}: Props) => {
                 
             </Dimensions.Provider>
         </svg>
-
-        <button style={{width:"max-content"}} onClick={exportSvgSignTableData} type="submit">Recupere Données !</button>
+        {extractDataButton &&
+        (
+            <button style={{width:"max-content"}} onClick={exportSvgSignTableData} type="submit">Recupere Données !</button>
+        )}
         </div> 
 };
 
@@ -113,20 +123,8 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
     let xXStep = Math.floor((dim.width-15-xX)/(1+variations.length));
 
     function handleRemoveVariation(index:number) {
-        setVariations((prev)=>{
-            const result: string[] = []
-            prev.forEach((value,i)=>{
-                if (i !== index) result.push(value)
-            })
-            return result
-        })
-        setVariationsSign((prev)=>{
-            const result:("+"|"-")[] = []
-            prev.forEach((value,i)=>{
-                if (i !== index) result.push(value)
-            })
-            return result
-        })
+        setVariations((prev)=>prev.filter((value,i)=>index!==i))
+        setVariationsSign((prev)=>prev.filter((value,i)=>index!==i))
     }
 
     const getVariationJSXElements = (variationIndex:number, xX:number,yX:number) : JSX.Element[]  => {
@@ -166,7 +164,7 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
         <foreignObject key={v4()} x={xX+xXStep/2-8} y={ySign} color="black" width={50} height={50} >
             <button onClick={()=>{
             setVariationsSign((prev)=>{
-                const currSign = variationsSign[variationSignIndex]
+                const currSign = prev[variationSignIndex]
                 const copy:("+"|"-")[]= [...prev]
                 copy[variationSignIndex] = (currSign === "+") ? "-" : "+"
                 return copy
@@ -177,19 +175,8 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
         return elements
     }
 
-    variations.forEach((value,index)=>{
-        xX = xX + xXStep
-        result = result.concat(
-            getVariationJSXElements(index,xX,yX),
-            getSignVaraiationJSXElements(index,xX,ySign,xXStep)
-        ) 
-    })
-
-
-
-    return (
-    <g>
-        <foreignObject 
+    result.push(
+    <foreignObject 
         key={v4()} 
         x={xX} y={yX} 
         width={50} height={25}>
@@ -210,19 +197,38 @@ const VariationsDisplay = ({start,setStart,end,setEnd,startSign,setStartSign,
                     <MarkdownParser text={`$${startSign}$`}></MarkdownParser>
                 </button>
         </foreignObject>
+    )
+
+    variations.forEach((value,index)=>{
+        xX = xX + xXStep
+        result = result.concat(
+            getVariationJSXElements(index,xX,yX),
+            getSignVaraiationJSXElements(index,xX,ySign,xXStep)
+        ) 
+    })
+
+
+    const endElement = useMemo(()=>{
+        return <foreignObject
+                    key={v4()}
+                    x={dim.width-30} 
+                    y={yX} width={50} height={25}>
+                        <form onSubmit={(e)=>{
+                            e.preventDefault()
+                            //@ts-ignore
+                            setEnd(()=>e.target[0].value)}}
+                            >
+                            <input style={inputStyle} defaultValue={end}></input>
+                        </form>
+                </foreignObject> 
+    },[end])
+
+
+
+    return (
+    <g>
         {result}
-        <foreignObject
-            key={v4()}
-            x={dim.width-30} 
-            y={yX} width={50} height={25}>
-                <form onSubmit={(e)=>{
-                    e.preventDefault()
-                    //@ts-ignore
-                    setEnd(()=>e.target[0].value)}}
-                    >
-                    <input style={inputStyle} defaultValue={end}></input>
-                </form>
-        </foreignObject>        
+        {endElement}    
     </g>
     )
 
