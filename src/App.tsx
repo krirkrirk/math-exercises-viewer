@@ -7,8 +7,6 @@ import { GeneratorsList } from "./generatorsList";
 import { GeneratorsListByLevel } from "./generatorsListByLevel";
 import { GeneratorsListBySection } from "./generatorsListBySection";
 import { SignTableAnswer } from "./signTableAnswer";
-import { uuid } from "uuidv4";
-import { v4 } from "uuid";
 
 function App() {
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
@@ -76,6 +74,7 @@ function App() {
     if (!prevExoId) return;
     onSelect(prevExoId);
   };
+
   return (
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
       <SignTableAnswer width={600} height={150}></SignTableAnswer>
