@@ -76,7 +76,6 @@ function App() {
 
   return (
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
-      <VariationTableAlt xValues={[]} fValues={[]} />
       {!!allExercises.length && (
         <div>
           <p>{exoCount} Générateurs</p>

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./variationTableAlt.css";
 
 type VariationTableAltProps = {
   xValues: number[];
   fValues: number[];
+  onValuesChange: (fValues: number[]) => void;
 };
 
 const WIDTH = 800;
@@ -24,9 +25,14 @@ const ARROW_MARKER_HEIGHT = 10;
 const VariationTableAlt: React.FC<VariationTableAltProps> = ({
   xValues,
   fValues,
+  onValuesChange,
 }) => {
   const [xVals, setXVals] = useState<number[]>(xValues);
   const [fVals, setFVals] = useState<number[]>(fValues);
+
+  useEffect(() => {
+    onValuesChange(fVals);
+  }, [fVals]);
 
   const xStep = WIDTH / (xVals.length + 2);
   const initialYPosition = fVals[0] > fVals[1] ? Y_TOP : Y_BOTTOM;

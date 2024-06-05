@@ -1,10 +1,10 @@
+import React, { useEffect, useRef, useState } from "react";
 import MarkdownParser from "./markdownParser";
 import { Exercise, Question } from "./types";
-import { useEffect, useRef, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
-import { InlineMath, BlockMath } from "react-katex";
+import { InlineMath } from "react-katex";
 import VariationTableAlt from "./variationTableAlt";
 
 type Props = {
@@ -70,7 +70,6 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       filename: question?.options?.isAxesRatioFixed
         ? "/geogebra-default-ortho.ggb"
         : "/geogebra-default-app.ggb",
-      // filename: "/geogebra-default-app.ggb",
       showFullscreenButton: true,
     };
     var applet = new window.GGBApplet(params, true);
@@ -108,8 +107,12 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     mathfieldRef.current.latex(question.answer);
   };
 
+  const handleValuesChange = (fValues: number[]) => {
+    question.identifiers.fValues = fValues;
+  };
+
   return (
-    <div className="border-white  bg-gray-900 p-3 m-2">
+    <div className="border-white bg-gray-900 p-3 m-2">
       {question.instruction && (
         <MarkdownParser text={question.instruction}></MarkdownParser>
       )}
@@ -126,6 +129,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         <VariationTableAlt
           xValues={question.variationTableAlt.xValues}
           fValues={question.variationTableAlt.fValues}
+          onValuesChange={handleValuesChange}
         />
       )}
 

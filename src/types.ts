@@ -1,9 +1,3 @@
-// export enum Connector {
-//   equal = "=",
-//   equiv = "\\iff",
-//   implies = "\\Rightarrow",
-// }
-
 import { KeyId } from "./keyIds";
 
 export type GeneratorOptions = {};
@@ -33,8 +27,12 @@ export interface Question<TIdentifiers = {}> {
     axisLabels?: string[];
   };
   divisionFormat?: "fraction" | "obelus";
-  variationTableAlt?: { xValues: number[]; fValues: number[] };
-  identifiers: TIdentifiers;
+  correctfValues?: number[];
+  variationTableAlt?: {
+    xValues: number[];
+    fValues: number[];
+  };
+  identifiers: TIdentifiers & { fValues: number[]; fValuess: number[] };
   propositions?: Proposition[];
 }
 
