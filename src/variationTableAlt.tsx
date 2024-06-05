@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./variationTable.css";
+import "./variationTableAlt.css";
 
-type VariationTableProps = {
+type VariationTableAltProps = {
   xValues: number[];
   fValues: number[];
 };
@@ -10,12 +10,18 @@ const WIDTH = 800;
 const HEIGHT = 300;
 const HEADER_HEIGHT = 50;
 const TEXT_Y_OFFSET = 25;
-const FX_Y_OFFSET = 75;
+const FX_Y_OFFSET = 100;
 const Y_TOP = 0;
 const Y_BOTTOM = 100;
 const OFFSET = 10;
+const BUTTON_SIZE = 30;
+const BUTTON_BG_COLOR = "#28a745";
+const BUTTON_TEXT_COLOR = "white";
+const INPUT_WIDTH = 20;
+const ARROW_MARKER_WIDTH = 10;
+const ARROW_MARKER_HEIGHT = 10;
 
-const VariationTable: React.FC<VariationTableProps> = ({
+const VariationTableAlt: React.FC<VariationTableAltProps> = ({
   xValues,
   fValues,
 }) => {
@@ -114,7 +120,7 @@ const VariationTable: React.FC<VariationTableProps> = ({
               {/* Valeurs de x */}
               <g className="value-group">
                 <foreignObject
-                  x={xPos + 75 - xPosAdjustment}
+                  x={xPos + 110 - xPosAdjustment}
                   y={TEXT_Y_OFFSET - 15}
                   width="50"
                   height="30"
@@ -127,7 +133,7 @@ const VariationTable: React.FC<VariationTableProps> = ({
                         handleXValueChange(index, e.target.value)
                       }
                       className="value-input"
-                      style={{ color: "black", width: "20px" }}
+                      style={{ color: "black", width: `${INPUT_WIDTH}px` }}
                     />
                     <button
                       onClick={() => removeXValue(index)}
@@ -141,7 +147,7 @@ const VariationTable: React.FC<VariationTableProps> = ({
               {/* Valeurs de f(x) */}
               <g className="value-group">
                 <foreignObject
-                  x={xPos + 75 - xPosAdjustment}
+                  x={xPos + 110 - xPosAdjustment}
                   y={yPosCurrent + FX_Y_OFFSET - 15}
                   width="50"
                   height="30"
@@ -154,16 +160,16 @@ const VariationTable: React.FC<VariationTableProps> = ({
                         handleFValueChange(index, e.target.value)
                       }
                       className="value-input"
-                      style={{ color: "black", width: "20px" }}
+                      style={{ color: "black", width: `${INPUT_WIDTH}px` }}
                     />
                   </div>
                 </foreignObject>
               </g>
               {index < xVals.length - 1 && (
                 <line
-                  x1={xPos + xStep / 2 + OFFSET}
+                  x1={xPos + xStep / 2 + OFFSET + 35}
                   y1={yPosCurrent + FX_Y_OFFSET}
-                  x2={xPos + xStep + xStep / 2 - OFFSET - 20}
+                  x2={xPos + xStep + xStep / 2 - OFFSET + 15}
                   y2={getYPosition(index + 1) + FX_Y_OFFSET}
                   stroke="black"
                   markerEnd="url(#arrow)"
@@ -173,21 +179,25 @@ const VariationTable: React.FC<VariationTableProps> = ({
           );
         })}
         <foreignObject
-          x={(xVals.length + 1) * xStep - 15}
+          x={
+            xVals.length === 0
+              ? xStep + (xStep - BUTTON_SIZE) / 2
+              : (xVals.length + 1) * xStep - 15
+          }
           y={TEXT_Y_OFFSET - 15}
-          width="30"
-          height="30"
+          width={BUTTON_SIZE}
+          height={BUTTON_SIZE}
         >
           <button
             onClick={addEmptyValues}
             className="add-button"
             style={{
-              width: "30px",
-              height: "30px",
-              backgroundColor: "#28a745",
+              width: `${BUTTON_SIZE}px`,
+              height: `${BUTTON_SIZE}px`,
+              backgroundColor: BUTTON_BG_COLOR,
               border: "none",
               borderRadius: "50%",
-              color: "white",
+              color: BUTTON_TEXT_COLOR,
               fontSize: "20px",
               display: "flex",
               alignItems: "center",
@@ -200,8 +210,8 @@ const VariationTable: React.FC<VariationTableProps> = ({
         <defs>
           <marker
             id="arrow"
-            markerWidth="10"
-            markerHeight="10"
+            markerWidth={ARROW_MARKER_WIDTH}
+            markerHeight={ARROW_MARKER_HEIGHT}
             refX="5"
             refY="5"
             orient="auto-start-reverse"
@@ -236,4 +246,4 @@ const VariationTable: React.FC<VariationTableProps> = ({
   );
 };
 
-export default VariationTable;
+export default VariationTableAlt;
