@@ -3,6 +3,7 @@ import { Dimensions } from "./signTableAnswer";
 import { LatexInSVG } from "./latexInSvg";
 import { v4 } from "uuid";
 import MarkdownParser from "./markdownParser";
+import { MathLatex } from "./types";
 
 
 type States = {
@@ -21,8 +22,8 @@ type States = {
 
 type Options = {
     extractDataButton?:boolean;
-    start?:string;
-    end?:string;
+    start?:MathLatex;
+    end?:MathLatex;
 }
 
 
@@ -102,7 +103,7 @@ export const SignVariationsDisplay = ({start,setStart,end,setEnd,startSign,setSt
 
     const startElement = (options?.start) 
     ? <foreignObject key={v4()} x={xX} y={yX} width={50} height={25} color="black">
-        <MarkdownParser text={`$${options.start}$`}></MarkdownParser>
+        <MarkdownParser text={`$${options.start.latexValue}$`}></MarkdownParser>
       </foreignObject> 
     : useMemo(()=>{
         return <foreignObject 
@@ -143,7 +144,7 @@ export const SignVariationsDisplay = ({start,setStart,end,setEnd,startSign,setSt
 
     const endElement = (options?.end) 
     ? <foreignObject key={v4()} x={dim.width-38} y={yX} width={50} height={25} color="black">
-        <MarkdownParser text={`$${options.end}$`}></MarkdownParser>
+        <MarkdownParser text={`$${options.end.latexValue}$`}></MarkdownParser>
     </foreignObject>
     : useMemo(()=>{
         return <foreignObject

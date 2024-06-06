@@ -20,7 +20,7 @@ export interface Question<TIdentifiers = {}> {
   startStatement?: string;
   answer?: string;
   answerFormat?: "tex" | "raw";
-  svgSignTableAnswer?: string;
+  svgSignTableAnswer?: FunctionSignVariations;
   keys?: KeyId[];
   commands?: string[];
   coords?: number[];
@@ -35,8 +35,8 @@ export interface Question<TIdentifiers = {}> {
     axisLabels?: string[];
   };
   svgSignTableOptions?: {
-    start?: string;
-    end?: string;
+    start?: MathLatex;
+    end?: MathLatex;
   };
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { LatexInSVG } from "./latexInSvg";
 import { v4 } from "uuid";
-import { FunctionSignVariations, Variation } from "./types";
+import { FunctionSignVariations, MathLatex, Variation } from "./types";
 import { SignVariationsDisplay } from "./signVariationsDisplay";
 
 type Props = {
@@ -13,8 +13,8 @@ type Props = {
 };
 
 type Options = {
-    start?:string;
-    end?:string;
+    start?:MathLatex;
+    end?:MathLatex;
 }
 
 export const Dimensions = createContext({width:0,height:0,xTabHeight:0,fTabHeight:0,xTabWidth:0})
@@ -48,9 +48,9 @@ export const SignTableAnswer = ({width, height,setSvgState,extractDataButton,opt
             variationsResult.push(variationFormat)
         }
         return {
-            start:(options?.start) ? {latexValue:options!.start!,mathValue:-Infinity} :{latexValue:start,mathValue:+start},
+            start:options?.start?? {latexValue:start,mathValue:+start},
             startSign,
-            end:(options?.end) ? {latexValue:options!.end!,mathValue:(options!.end!.charAt(0) === "-") ? Infinity : -Infinity} :{latexValue:end,mathValue:+end},
+            end:options?.end?? {latexValue:end,mathValue:+end},
             variations:variationsResult
         }
     }

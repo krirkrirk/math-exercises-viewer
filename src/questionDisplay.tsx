@@ -142,7 +142,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        ans: JSON.stringify(svgSignTableState),
+        ans: svgSignTableState,
         svgVeaProps : {svgSignTableAnswer:question.svgSignTableAnswer,...question.identifiers}
       })
     }).then((res)=>res.json()).then((res)=>{
@@ -169,7 +169,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
       <AnswerDisplay
-        answer={(question.answer || question.svgSignTableAnswer)!}
+        answer={(question.answer || JSON.stringify(question.svgSignTableAnswer))!}
         answerFormat={question.answerFormat ?? "tex"}
       />
       <div>
