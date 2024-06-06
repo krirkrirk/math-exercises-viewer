@@ -21,7 +21,6 @@ type States = {
 }
 
 type Options = {
-    extractDataButton?:boolean;
     start?:MathLatex;
     end?:MathLatex;
 }
