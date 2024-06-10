@@ -76,6 +76,11 @@ function App() {
 
   return (
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
+      <VariationTableAlt
+        xValues={[]}
+        fValues={[]}
+        onValuesChange={(values) => console.log(values)}
+      />
       {!!allExercises.length && (
         <div>
           <p>{exoCount} Générateurs</p>

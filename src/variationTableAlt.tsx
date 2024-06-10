@@ -19,8 +19,6 @@ const BUTTON_SIZE = 30;
 const BUTTON_BG_COLOR = "#28a745";
 const BUTTON_TEXT_COLOR = "white";
 const INPUT_WIDTH = 20;
-const ARROW_MARKER_WIDTH = 10;
-const ARROW_MARKER_HEIGHT = 10;
 
 const VariationTableAlt: React.FC<VariationTableAltProps> = ({
   xValues,
@@ -32,7 +30,7 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
 
   useEffect(() => {
     onValuesChange(fVals);
-  }, [fVals]);
+  }, [fVals, onValuesChange]);
 
   const xStep = WIDTH / (xVals.length + 2);
   const initialYPosition = fVals[0] > fVals[1] ? Y_TOP : Y_BOTTOM;
@@ -50,7 +48,7 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
 
   const addEmptyValues = () => {
     setXVals([...xVals, NaN]);
-    setFVals([...fVals, NaN]);
+    setFVals([...fVals, NaN, NaN]); // Ajouter deux valeurs NaN pour f(x)
   };
 
   const resetValues = () => {
@@ -60,7 +58,9 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
 
   const removeXValue = (index: number) => {
     const newXVals = xVals.filter((_, i) => i !== index);
-    const newFVals = fVals.filter((_, i) => i !== index);
+    const newFVals = fVals.filter(
+      (_, i) => i !== index * 2 && i !== index * 2 + 1
+    );
     setXVals(newXVals);
     setFVals(newFVals);
   };
@@ -71,11 +71,18 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
     setXVals(newXVals);
   };
 
-  const handleFValueChange = (index: number, value: string) => {
+  const handleFValueChange = (
+    index: number,
+    value: string,
+    pos: "top" | "bottom"
+  ) => {
     const newFVals = [...fVals];
-    newFVals[index] = parseFloat(value);
+    const fIndex = index * 2 + (pos === "top" ? 0 : 1);
+    newFVals[fIndex] = parseFloat(value);
     setFVals(newFVals);
   };
+
+  const switcharrow = () => {};
 
   return (
     <div>
@@ -128,7 +135,7 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
                 <foreignObject
                   x={xPos + 110 - xPosAdjustment}
                   y={TEXT_Y_OFFSET - 15}
-                  width="50"
+                  width="100"
                   height="30"
                 >
                   <div className="value-container">
@@ -147,23 +154,53 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
                     >
                       X
                     </button>
+                    {/* Switch button */}
+                    <button
+                      onClick={() => switcharrow()}
+                      className="reverse-button"
+                    >
+                      ↕
+                    </button>
                   </div>
                 </foreignObject>
               </g>
-              {/* Valeurs de f(x) */}
+              {/* Valeurs de f(x) en haut */}
               <g className="value-group">
                 <foreignObject
                   x={xPos + 110 - xPosAdjustment}
-                  y={yPosCurrent + FX_Y_OFFSET - 15}
+                  y={FX_Y_OFFSET - 20}
                   width="50"
                   height="30"
                 >
                   <div className="value-container">
                     <input
                       type="text"
-                      value={isNaN(fVals[index]) ? "" : fVals[index]}
+                      value={isNaN(fVals[index * 2]) ? "" : fVals[index * 2]}
                       onChange={(e) =>
-                        handleFValueChange(index, e.target.value)
+                        handleFValueChange(index, e.target.value, "top")
+                      }
+                      className="value-input"
+                      style={{ color: "black", width: `${INPUT_WIDTH}px` }}
+                    />
+                  </div>
+                </foreignObject>
+              </g>
+              {/* Valeurs de f(x) en bas */}
+              <g className="value-group">
+                <foreignObject
+                  x={xPos + 110 - xPosAdjustment}
+                  y={FX_Y_OFFSET + 85}
+                  width="50"
+                  height="30"
+                >
+                  <div className="value-container">
+                    <input
+                      type="text"
+                      value={
+                        isNaN(fVals[index * 2 + 1]) ? "" : fVals[index * 2 + 1]
+                      }
+                      onChange={(e) =>
+                        handleFValueChange(index, e.target.value, "bottom")
                       }
                       className="value-input"
                       style={{ color: "black", width: `${INPUT_WIDTH}px` }}
@@ -172,14 +209,41 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
                 </foreignObject>
               </g>
               {index < xVals.length - 1 && (
-                <line
-                  x1={xPos + xStep / 2 + OFFSET + 35}
-                  y1={yPosCurrent + FX_Y_OFFSET}
-                  x2={xPos + xStep + xStep / 2 - OFFSET + 15}
-                  y2={getYPosition(index + 1) + FX_Y_OFFSET}
-                  stroke="black"
-                  markerEnd="url(#arrow)"
-                />
+                <>
+                  {/* Ligne de variation */}
+                  <line
+                    x1={xPos + xStep / 2 + OFFSET + 35}
+                    y1={yPosCurrent + FX_Y_OFFSET}
+                    x2={xPos + xStep + xStep / 2 - OFFSET + 15}
+                    y2={getYPosition(index + 1) + FX_Y_OFFSET}
+                    stroke="black"
+                    markerEnd="url(#arrow)"
+                  />
+                  {/* Bouton de reverse */}
+                  <foreignObject
+                    x={xPos + xStep / 2 + OFFSET + 30}
+                    y={HEADER_HEIGHT + 10}
+                    width="20"
+                    height="20"
+                  >
+                    <div className="reverse-button-container">
+                      <button
+                        className="reverse-button"
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                          backgroundColor: "blue",
+                          border: "1px solid black",
+                          borderRadius: "50%",
+                          cursor: "pointer",
+                          color: "white",
+                        }}
+                      >
+                        ↕
+                      </button>
+                    </div>
+                  </foreignObject>
+                </>
               )}
             </React.Fragment>
           );
@@ -188,7 +252,7 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
           x={
             xVals.length === 0
               ? xStep + (xStep - BUTTON_SIZE) / 2
-              : (xVals.length + 1) * xStep - 15
+              : (xVals.length + 1) * xStep + 50
           }
           y={TEXT_Y_OFFSET - 15}
           width={BUTTON_SIZE}
@@ -216,11 +280,11 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
         <defs>
           <marker
             id="arrow"
-            markerWidth={ARROW_MARKER_WIDTH}
-            markerHeight={ARROW_MARKER_HEIGHT}
+            markerWidth={10}
+            markerHeight={10}
             refX="5"
             refY="5"
-            orient="auto-start-reverse"
+            orient="auto"
           >
             <path d="M0,0 L10,5 L0,10 z" fill="#000" />
           </marker>
