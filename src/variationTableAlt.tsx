@@ -27,6 +27,9 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
 }) => {
   const [xVals, setXVals] = useState<number[]>(xValues);
   const [fVals, setFVals] = useState<number[]>(fValues);
+  const [arrowDirections, setArrowDirections] = useState<string[]>(
+    Array(xValues.length).fill("up")
+  );
 
   useEffect(() => {
     onValuesChange(fVals);
@@ -48,12 +51,14 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
 
   const addEmptyValues = () => {
     setXVals([...xVals, NaN]);
-    setFVals([...fVals, NaN, NaN]); // Ajouter deux valeurs NaN pour f(x)
+    setFVals([...fVals, NaN, NaN]);
+    setArrowDirections([...arrowDirections, "up"]);
   };
 
   const resetValues = () => {
     setXVals([]);
     setFVals([]);
+    setArrowDirections([]);
   };
 
   const removeXValue = (index: number) => {
@@ -82,7 +87,12 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
     setFVals(newFVals);
   };
 
-  const switcharrow = () => {};
+  const switcharrow = (index: number) => {
+    const newArrowDirections = [...arrowDirections];
+    newArrowDirections[index] =
+      newArrowDirections[index] === "up" ? "down" : "up";
+    setArrowDirections(newArrowDirections);
+  };
 
   return (
     <div>
@@ -156,7 +166,7 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
                     </button>
                     {/* Switch button */}
                     <button
-                      onClick={() => switcharrow()}
+                      onClick={() => switcharrow(index)}
                       className="reverse-button"
                     >
                       ↕
@@ -213,9 +223,17 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
                   {/* Ligne de variation */}
                   <line
                     x1={xPos + xStep / 2 + OFFSET + 35}
-                    y1={yPosCurrent + FX_Y_OFFSET}
+                    y1={
+                      arrowDirections[index] === "up"
+                        ? yPosCurrent + FX_Y_OFFSET
+                        : getYPosition(index + 1) + FX_Y_OFFSET
+                    }
                     x2={xPos + xStep + xStep / 2 - OFFSET + 15}
-                    y2={getYPosition(index + 1) + FX_Y_OFFSET}
+                    y2={
+                      arrowDirections[index] === "up"
+                        ? getYPosition(index + 1) + FX_Y_OFFSET
+                        : yPosCurrent + FX_Y_OFFSET
+                    }
                     stroke="black"
                     markerEnd="url(#arrow)"
                   />
@@ -228,6 +246,7 @@ const VariationTableAlt: React.FC<VariationTableAltProps> = ({
                   >
                     <div className="reverse-button-container">
                       <button
+                        onClick={() => switcharrow(index)}
                         className="reverse-button"
                         style={{
                           width: "20px",
