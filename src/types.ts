@@ -18,8 +18,9 @@ export type Proposition = {
 export interface Question<TIdentifiers = {}> {
   instruction: string;
   startStatement?: string;
-  answer: string;
-  answerFormat: "tex" | "raw";
+  answer?: string;
+  tableAnswer?: string[][];
+  answerFormat?: "tex" | "raw";
   keys?: KeyId[];
   commands?: string[];
   coords?: number[];
@@ -33,6 +34,7 @@ export interface Question<TIdentifiers = {}> {
     is3D?: boolean;
     axisLabels?: string[];
   };
+  tableValues?: TableValues;
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
   propositions?: Proposition[];
@@ -46,6 +48,10 @@ export type VEA<TIdentifiers> = (
   studentAnswer: string,
   args: { answer: string } & TIdentifiers
 ) => boolean;
+export type TableVEA<TIdentifiers> = (
+  studentAnswer: string[][],
+  args: { tableAnswer: string[][] } & TIdentifiers
+) => boolean;
 export type QuestionGenerator<TIdentifiers = {}, TOptions = {}> = (
   opts?: TOptions
 ) => Question<TIdentifiers>;
@@ -56,11 +62,12 @@ export interface Exercise<TIdentifiers = {}> {
   connector?: "=" | "\\iff" | "\\approx";
   generator: (n: number) => Question<TIdentifiers>[];
   maxAllowedQuestions?: number;
-  answerType?: "QCM" | "free";
+  answerType?: "QCM" | "free" | "Table";
   qcmTimer: number;
   freeTimer: number;
   getPropositions?: QCMGenerator<{ answer: string } & TIdentifiers>;
   isAnswerValid?: VEA<TIdentifiers>;
+  isTableSVGAnswerValid?: TableVEA<TIdentifiers>;
   hasGeogebra?: boolean;
   is3d?: boolean;
   subject: "Mathématiques" | "Chimie" | "Physique";
@@ -71,6 +78,7 @@ export type TableValues = {
   columnNames: string[];
   values: string[][];
 };
+
 export type Level =
   | "6ème"
   | "5ème"

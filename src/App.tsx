@@ -7,6 +7,7 @@ import { QuestionDisplay } from "./questionDisplay";
 import { GeneratorsList } from "./generatorsList";
 import { GeneratorsListByLevel } from "./generatorsListByLevel";
 import { GeneratorsListBySection } from "./generatorsListBySection";
+import { TableOfTwoEntries } from "./tableOfTwoEntries";
 
 function App() {
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);

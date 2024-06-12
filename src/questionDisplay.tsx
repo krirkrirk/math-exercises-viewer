@@ -5,6 +5,7 @@ import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
+import { TableOfTwoEntries } from "./tableOfTwoEntries";
 
 type Props = {
   exo: Exercise;
@@ -121,6 +122,30 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     mathfieldRef.current.latex(question.answer);
   };
 
+  const [tableValues,setTableValues] = useState<string[][]>([])
+  const [tableVea, setTableVea] = useState<boolean>()
+
+
+
+  function checkTableVea(){
+    fetch(`http://localhost:5000/tableVea?exoId=${exo.id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        ans: tableValues,
+        veaProps: { tableAnswer: question.tableAnswer, ...question.identifiers },
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setTableVea(res.result);
+      })
+      .catch((err) => console.log(err));
+  }
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
@@ -138,7 +163,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
       <AnswerDisplay
-        answer={question.answer}
+        answer={(question.answer || question.tableAnswer?.toString())!}
         answerFormat={question.answerFormat ?? "tex"}
       />
       <div>
@@ -166,7 +191,6 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
             numericToolbarKeys={question.keys}
             setValue={setLatex}
             setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
-            forbidOtherKeyboardKeys={true}
           />
           <p>
             bonne réponse officielle :{" "}
@@ -182,6 +206,13 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           </div>
           <p>latex: {latex}</p>
           <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
+          <TableOfTwoEntries width={600} height={200} tableValues={question.tableValues!} setTableValues={setTableValues}/>
+          <button onClick={checkTableVea} className="border mx-3">
+              check tableVea
+            </button>
+            {tableVea !== undefined && (
+              <span>{tableVea ? "OK!" : "Non"}</span>
+            )}
         </>
       )}
     </div>
