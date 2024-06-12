@@ -66,6 +66,11 @@ export interface Exercise<TIdentifiers = {}> {
   subject: "Mathématiques" | "Chimie" | "Physique";
 }
 
+export type TableValues = {
+  lineNames: string[];
+  columnNames: string[];
+  values: string[][];
+};
 export type Level =
   | "6ème"
   | "5ème"
