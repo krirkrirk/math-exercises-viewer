@@ -123,7 +123,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM,isTable }: Props) 
     mathfieldRef.current.latex(question.answer);
   };
 
-  const [studentTable,setStudentTable] = useState<string[][]>(question.tableValues?.values?? [])
+  const [studentTable,setStudentTable] = useState<string[][]>([])
   const [tableVea, setTableVea] = useState<boolean>()
 
 

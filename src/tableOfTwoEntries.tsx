@@ -53,7 +53,9 @@ const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,se
     
     const [values,setValues] = useState<string[][]>(copyMatrix(tableValues.values))
 
-    useEffect(()=>setStudentTable((prev)=>values),[values])
+    useEffect(
+        ()=>setStudentTable((prev)=>copyMatrix(values)),
+        [values])
 
 
     function getTableJSXElements(){
@@ -109,20 +111,21 @@ const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,se
     }
 
     function getValueJSXElement(line:number,column:number,position:any){
-        return <text key={v4()} x={position.x} y={position.y}>{tableValues.values[line][column]}</text>
+        return <text key={v4()} x={position.x} y={position.y}>{values[line][column]}</text>
     }
 
     function getInputJSXElement(line:number,column:number,position:any){
         return <foreignObject key={v4()} x={position.x} y={position.y-15} width={40} height={20} color="black">
-            <form id={v4()} onSubmit={(e)=>{
+            <form onSubmit={(e)=>{
                 e.preventDefault()
                 setValues((prev)=>{
                     const newTable = copyMatrix(prev)
                     newTable[line][column] = e.target[0].value
+                    console.log(values,prev)
                     return newTable
                 })
             }}>
-                <input name="inputValue" style={inputStyle} defaultValue={values[line][column]}></input>
+                <input style={inputStyle} defaultValue={values[line][column]}></input>
             </form>
         </foreignObject>
     }
