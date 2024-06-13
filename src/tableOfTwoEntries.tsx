@@ -81,7 +81,6 @@ const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,set
         let columnPosition = {x1:dim.leftTable.width+columnSize,x2:dim.leftTable.width+columnSize,y1:1,y2:dim.height}
         let valuePosition = {x:0,y:linePosition.y1 - lineSize/2}
 
-        console.log(tableValues.values)
         for (let line = 0; line<lineCount; line ++){
             valuePosition.x = columnPosition.x1-columnSize/2
             for (let column = 0 ;column<columnCount; column++){
