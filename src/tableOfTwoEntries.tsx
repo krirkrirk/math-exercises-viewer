@@ -31,9 +31,9 @@ const Dimensions = createContext({width:0,height:0,upTable:{width:0,height:0},le
 export const TableOfTwoEntries = ({width, height,tableValues,setTableValues}: Props) => {
 
     
-    const upTable = {width:width,height:Math.floor(height*0.30)}
+    const upTable = (tableValues.lineNames.length !== 0) ? {width:width,height:Math.floor(height*0.30)} : {width:0,height:0}
 
-    const leftTable = {width:Math.floor(width*0.20), height:height}
+    const leftTable = (tableValues.columnNames.length !== 0) ? {width:Math.floor(width*0.20), height:height} : {width:0, height:0}
 
 
     return <Dimensions.Provider value={{width:width,height:height,upTable,leftTable}}>
@@ -54,8 +54,8 @@ const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,set
     const remainingWidth = dim.width-dim.leftTable.width
     const remainingHeight = dim.height-dim.upTable.height
 
-    const lineSize = remainingHeight/tableValues.lineNames.length
-    const columnSize = remainingWidth/tableValues.columnNames.length
+    const lineSize = (remainingHeight !== dim.height) ? remainingHeight/tableValues.lineNames.length : remainingHeight/tableValues.values.length
+    const columnSize = (remainingWidth !== dim.width) ? remainingWidth/tableValues.columnNames.length : remainingWidth/tableValues.values[0].length
 
     const copyValues:string[][] = []
 
@@ -74,14 +74,17 @@ const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,set
     function getTableJSXElements(){
         const result = []
 
+        const lineCount = (tableValues.lineNames.length!==0) ? tableValues.lineNames.length : tableValues.values.length
+        const columnCount = (tableValues.columnNames.length!==0) ? tableValues.columnNames.length : tableValues.values[0].length
+
         let linePosition = {x1:1,x2:dim.width,y1:dim.upTable.height+lineSize,y2:dim.upTable.height+lineSize}
         let columnPosition = {x1:dim.leftTable.width+columnSize,x2:dim.leftTable.width+columnSize,y1:1,y2:dim.height}
         let valuePosition = {x:0,y:linePosition.y1 - lineSize/2}
 
-
-        for (let line = 0; line<tableValues.lineNames.length; line ++){
+        console.log(tableValues.values)
+        for (let line = 0; line<lineCount; line ++){
             valuePosition.x = columnPosition.x1-columnSize/2
-            for (let column = 0 ;column<tableValues.columnNames.length; column++){
+            for (let column = 0 ;column<columnCount; column++){
                 if (tableValues.values[line][column] === ""){
                     result.push(getInputJSXElement(line,column,valuePosition))
                 }
@@ -93,13 +96,13 @@ const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,set
             valuePosition.y+=lineSize
         }
 
-        for (let line = 0; line<tableValues.lineNames.length; line++){
+        for (let line = 0; line<lineCount; line++){
             result.push(getLineJSXElement(line,linePosition))
             linePosition.y1 = linePosition.y1+lineSize
             linePosition.y2 = linePosition.y1
         }
 
-        for (let column = 0; column<tableValues.columnNames.length; column++){
+        for (let column = 0; column<columnCount; column++){
             result.push(getLineJSXElement(column,columnPosition))
             columnPosition.x1 = columnPosition.x1+columnSize
             columnPosition.x2 = columnPosition.x1
@@ -113,13 +116,12 @@ const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,set
             x:(linePosition.y1===linePosition.y2) ? dim.leftTable.width/2-5 : linePosition.x1-columnSize/2,
             y:(linePosition.y1===linePosition.y2) ? linePosition.y1-lineSize/2 : dim.upTable.height/2
         }
-        console.log(name,namePosition)
-        return [
+        return (name) ? [
             <line key={v4()} x1={linePosition.x1} y1={linePosition.y1} x2={linePosition.x2} y2={linePosition.y2} stroke="black"/>,
             <foreignObject key={v4()} x={namePosition.x} y={namePosition.y-10} width={40} height={20} color="black">
                 <MarkdownParser text={`$${name}$`}></MarkdownParser>
             </foreignObject>
-        ]
+        ] : [ <line key={v4()} x1={linePosition.x1} y1={linePosition.y1} x2={linePosition.x2} y2={linePosition.y2} stroke="black"/>,]
     }
 
     function getValueJSXElement(line:number,column:number,position:any){

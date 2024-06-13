@@ -184,13 +184,14 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           ))}
         </>
       )}
-      {!isQCM && (
+      {!isQCM && exo.answerType != "Table" && (
         <>
           <p>Clavier : </p>
           <MathInput
             numericToolbarKeys={question.keys}
             setValue={setLatex}
             setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
+            forbidOtherKeyboardKeys={true}
           />
           <p>
             bonne réponse officielle :{" "}
@@ -206,13 +207,19 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           </div>
           <p>latex: {latex}</p>
           <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
+        </>
+      )}
+      {exo.answerType === "Table" && (
+        <>
           <TableOfTwoEntries width={600} height={200} tableValues={question.tableValues!} setTableValues={setTableValues}/>
-          <button onClick={checkTableVea} className="border mx-3">
-              check tableVea
-            </button>
-            {tableVea !== undefined && (
-              <span>{tableVea ? "OK!" : "Non"}</span>
-            )}
+            <button onClick={checkTableVea} className="border mx-3">
+                check tableVea
+              </button>
+              {tableVea !== undefined && (
+                <span>{tableVea ? "OK!" : "Non"}</span>
+              )}
+          <p>latex: {latex}</p>
+          <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
         </>
       )}
     </div>
