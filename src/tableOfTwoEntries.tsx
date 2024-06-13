@@ -26,9 +26,9 @@ const Dimensions = createContext({width:0,height:0,upTable:{width:0,height:0},le
 export const TableOfTwoEntries = ({width, height,tableValues,setStudentTable}: Props) => {
 
     
-    const upTable = (tableValues.lineNames.length !== 0) ? {width:width,height:Math.floor(height*0.30)} : {width:0,height:0}
+    const upTable = (tableValues.columnNames.length !== 0) ? {width:width,height:Math.floor(height*0.30)} : {width:0,height:0}
 
-    const leftTable = (tableValues.columnNames.length !== 0) ? {width:Math.floor(width*0.20), height:height} : {width:0, height:0}
+    const leftTable = (tableValues.lineNames.length !== 0) ? {width:Math.floor(width*0.20), height:height} : {width:0, height:0}
 
 
     return <Dimensions.Provider value={{width:width,height:height,upTable,leftTable}}>
@@ -49,8 +49,8 @@ const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,se
     const remainingWidth = dim.width-dim.leftTable.width
     const remainingHeight = dim.height-dim.upTable.height
 
-    const lineSize = (remainingHeight !== dim.height) ? remainingHeight/tableValues.lineNames.length : remainingHeight/tableValues.values.length
-    const columnSize = (remainingWidth !== dim.width) ? remainingWidth/tableValues.columnNames.length : remainingWidth/tableValues.values[0].length
+    const lineSize = (tableValues.lineNames.length !== 0) ? remainingHeight/tableValues.lineNames.length : remainingHeight/tableValues.values.length
+    const columnSize = (tableValues.columnNames.length !== 0) ? remainingWidth/tableValues.columnNames.length : remainingWidth/tableValues.values[0].length
 
 
     const [values,setValues] = useState<string[][]>(copyMatrix(tableValues.values))
