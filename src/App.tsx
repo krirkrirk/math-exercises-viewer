@@ -113,31 +113,33 @@ function App() {
       )}
       {selectedExercise?.id && (
         <div style={{ width: "100%" }}>
-          <button
-            onClick={(e) =>
-              (window.location.href = window.location.href + "&isGGB=true")
-            }
-            className="border-2 p-3"
-          >
-            Version GGB
-          </button>
+          {!isGGB && (
+            <button
+              onClick={(e) =>
+                (window.location.href = window.location.href.replace("&isQCM=true","") + "&isGGB=true")
+              }
+              className="border-2 p-3"
+              >
+              Version GGB
+            </button>
+          )}
           {!isQCM && (
             <button
               onClick={(e) =>
-                (window.location.href = window.location.href + "&isQCM=true")
+                (window.location.href = window.location.href.replace("&isGGB=true","") + "&isQCM=true")
               }
               className="border-2 p-3"
             >
               Version QCM
             </button>
           )}
-          {isQCM && (
+          {isQCM || isGGB && (
             <button
               onClick={(e) =>
                 (window.location.href = window.location.href.replace(
                   "&isQCM=true",
                   ""
-                ))
+                ).replace("&isGGB=true",""))
               }
               className="border-2 p-3"
             >
