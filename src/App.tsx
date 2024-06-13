@@ -32,7 +32,7 @@ function App() {
     setIsTable(table === "true")
     if (exoId) {
       if (table === "true"){
-        fetch(`http://localhost:5000/tableExo?exoId=${exoId}`)
+        fetch(`http://localhost:5000/exo?exoId=${exoId}`)
           .then((res) => res.json())
           .then((res) => {
             setSelectedExercise(res.exercise);
@@ -133,26 +133,13 @@ function App() {
                 Version Table
             </button>
           )}
-          {isQCM && (
+          {isQCM || isTable && (
               <button
                 onClick={(e) =>
                   (window.location.href = window.location.href.replace(
                     "&isQCM=true",
                     ""
-                  ))
-                }
-                className="border-2 p-3"
-              >
-                Version Free
-              </button>
-          )}
-          {isTable && (
-              <button
-                onClick={(e) =>
-                  (window.location.href = window.location.href.replace(
-                    "&isTable=true",
-                    ""
-                  ))
+                  ).replace("&isTable=true",""))
                 }
                 className="border-2 p-3"
               >

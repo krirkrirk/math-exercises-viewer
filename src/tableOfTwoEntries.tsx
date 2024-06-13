@@ -18,6 +18,8 @@ type Props = {
 }
 
 
+
+
 const Dimensions = createContext({width:0,height:0,upTable:{width:0,height:0},leftTable:{width:0,height:0}})
 
 
@@ -32,8 +34,8 @@ export const TableOfTwoEntries = ({width, height,tableValues,setStudentTable}: P
     return <Dimensions.Provider value={{width:width,height:height,upTable,leftTable}}>
         <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} style={{margin:0}}>
                 <rect width={width} height={height} x={1} y={1} style={{fill:"white",stroke:"black",strokeWidth:1}}/>
-                <line x1={leftTable.width} y1={1} x2={leftTable.width} y2={height} stroke="black"/>
-                <line x1={1} y1={upTable.height} x2={width} y2={upTable.height} stroke="black"/>
+                <line x1={1+leftTable.width} y1={1} x2={1+leftTable.width} y2={height} stroke="black"/>
+                <line x1={1} y1={1+upTable.height} x2={width} y2={1+upTable.height} stroke="black"/>
                 <ValuesDisplay tableValues={tableValues} setStudentTable={setStudentTable} ></ValuesDisplay>
         </svg>
     </Dimensions.Provider>
@@ -50,12 +52,11 @@ const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,se
     const lineSize = (remainingHeight !== dim.height) ? remainingHeight/tableValues.lineNames.length : remainingHeight/tableValues.values.length
     const columnSize = (remainingWidth !== dim.width) ? remainingWidth/tableValues.columnNames.length : remainingWidth/tableValues.values[0].length
 
-    
+
     const [values,setValues] = useState<string[][]>(copyMatrix(tableValues.values))
 
-    useEffect(
-        ()=>setStudentTable((prev)=>copyMatrix(values)),
-        [values])
+    useEffect(()=>setStudentTable((prev)=>values),[values])
+    useEffect(()=>setValues(copyMatrix(tableValues.values)),[tableValues.values])
 
 
     function getTableJSXElements(){
@@ -111,7 +112,7 @@ const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,se
     }
 
     function getValueJSXElement(line:number,column:number,position:any){
-        return <text key={v4()} x={position.x} y={position.y}>{values[line][column]}</text>
+        return <text key={v4()} x={position.x} y={position.y}>{tableValues.values[line][column]}</text>
     }
 
     function getInputJSXElement(line:number,column:number,position:any){
