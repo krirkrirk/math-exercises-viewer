@@ -14,21 +14,14 @@ type Props = {
     width:number,
     height:number,
     tableValues:TableValues
-    setTableValues:React.Dispatch<React.SetStateAction<string[][]>>
+    setStudentTable:React.Dispatch<React.SetStateAction<string[][]>>
 }
 
-
-
-type TableProps = {
-    tableValues:TableValues
-    upTable: {width:number,height:number}
-    leftTable: {width:number,height:number} 
-}
 
 const Dimensions = createContext({width:0,height:0,upTable:{width:0,height:0},leftTable:{width:0,height:0}})
 
 
-export const TableOfTwoEntries = ({width, height,tableValues,setTableValues}: Props) => {
+export const TableOfTwoEntries = ({width, height,tableValues,setStudentTable}: Props) => {
 
     
     const upTable = (tableValues.lineNames.length !== 0) ? {width:width,height:Math.floor(height*0.30)} : {width:0,height:0}
@@ -41,13 +34,13 @@ export const TableOfTwoEntries = ({width, height,tableValues,setTableValues}: Pr
                 <rect width={width} height={height} x={1} y={1} style={{fill:"white",stroke:"black",strokeWidth:1}}/>
                 <line x1={leftTable.width} y1={1} x2={leftTable.width} y2={height} stroke="black"/>
                 <line x1={1} y1={upTable.height} x2={width} y2={upTable.height} stroke="black"/>
-                <ValuesDisplay tableValues={tableValues} setTableValues={setTableValues} ></ValuesDisplay>
+                <ValuesDisplay tableValues={tableValues} setStudentTable={setStudentTable} ></ValuesDisplay>
         </svg>
     </Dimensions.Provider>
 };
 
 
-const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,setTableValues:any}) => {
+const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,setStudentTable:React.Dispatch<React.SetStateAction<string[][]>>}) => {
     const dim = useContext(Dimensions)
 
 
@@ -57,18 +50,10 @@ const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,set
     const lineSize = (remainingHeight !== dim.height) ? remainingHeight/tableValues.lineNames.length : remainingHeight/tableValues.values.length
     const columnSize = (remainingWidth !== dim.width) ? remainingWidth/tableValues.columnNames.length : remainingWidth/tableValues.values[0].length
 
-    const copyValues:string[][] = []
+    
+    const [values,setValues] = useState<string[][]>(copyMatrix(tableValues.values))
 
-    tableValues.values.forEach((value,index)=>{
-        copyValues.push([])
-        value.forEach(el=>copyValues[index].push(el+""))
-    })
-
-    const [values,setValues] = useState<string[][]>(copyValues)
-
-    useEffect(()=>{setTableValues(values)})
-
-    useEffect(()=>{setTableValues(values)},[values])
+    useEffect(()=>setStudentTable((prev)=>values),[values])
 
 
     function getTableJSXElements(){
@@ -129,15 +114,15 @@ const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,set
 
     function getInputJSXElement(line:number,column:number,position:any){
         return <foreignObject key={v4()} x={position.x} y={position.y-15} width={40} height={20} color="black">
-            <form onSubmit={(e)=>{
+            <form id={v4()} onSubmit={(e)=>{
                 e.preventDefault()
                 setValues((prev)=>{
-                    const newTable = prev.slice()
+                    const newTable = copyMatrix(prev)
                     newTable[line][column] = e.target[0].value
                     return newTable
                 })
             }}>
-                <input style={inputStyle} defaultValue={values[line][column]}></input>
+                <input name="inputValue" style={inputStyle} defaultValue={values[line][column]}></input>
             </form>
         </foreignObject>
     }
@@ -146,4 +131,17 @@ const ValuesDisplay = ({tableValues,setTableValues}:{tableValues:TableValues,set
     return <g>
         {getTableJSXElements()}
     </g>
+}
+
+
+
+function copyMatrix<T>(matrix:T[][]){
+    const copy:T[][] = []
+    for (let i = 0; i<matrix.length; i++){
+        copy.push([])
+        for (let j = 0; j<matrix[0].length; j++){
+            copy[i][j] = matrix[i][j]
+        }
+    }
+    return copy
 }

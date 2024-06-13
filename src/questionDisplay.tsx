@@ -12,9 +12,10 @@ type Props = {
   question: Question;
   index: number;
   isQCM: boolean;
+  isTable:boolean;
 };
 
-export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
+export const QuestionDisplay = ({ exo, question, index, isQCM,isTable }: Props) => {
   const appletOnLoad = (app: any) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
@@ -122,7 +123,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     mathfieldRef.current.latex(question.answer);
   };
 
-  const [tableValues,setTableValues] = useState<string[][]>([])
+  const [studentTable,setStudentTable] = useState<string[][]>(question.tableValues?.values?? [])
   const [tableVea, setTableVea] = useState<boolean>()
 
 
@@ -135,7 +136,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        ans: tableValues,
+        ans: studentTable,
         veaProps: { tableAnswer: question.tableAnswer, ...question.identifiers },
       }),
     })
@@ -184,7 +185,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           ))}
         </>
       )}
-      {!isQCM && exo.answerType != "Table" && (
+      {!isQCM && !isTable && (
         <>
           <p>Clavier : </p>
           <MathInput
@@ -209,9 +210,9 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
         </>
       )}
-      {exo.answerType === "Table" && (
+      {isTable && (
         <>
-          <TableOfTwoEntries width={600} height={200} tableValues={question.tableValues!} setTableValues={setTableValues}/>
+          <TableOfTwoEntries width={600} height={200} tableValues={question.tableValues!} setStudentTable={setStudentTable}/>
             <button onClick={checkTableVea} className="border mx-3">
                 check tableVea
               </button>
