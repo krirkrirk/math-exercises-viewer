@@ -255,7 +255,7 @@ export const QuestionDisplay = ({
           ))}
         </>
       )}
-      {!isQCM && (
+      {!isQCM && !isGGB && (
         <>
           <p>Clavier : </p>
           <MathInput
