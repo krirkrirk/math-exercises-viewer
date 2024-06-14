@@ -36,6 +36,7 @@ export interface Question<TIdentifiers = {}> {
     axisLabels?: string[];
   };
   divisionFormat?: "fraction" | "obelus";
+  variationTable?: { xValues: number[]; fValues: number[] };
   identifiers: TIdentifiers;
   propositions?: Proposition[];
 }
