@@ -133,7 +133,7 @@ function App() {
                 Version Table
             </button>
           )}
-          {isQCM || isTable && (
+          {(isQCM || isTable) && (
               <button
                 onClick={(e) =>
                   (window.location.href = window.location.href.replace(
