@@ -84,20 +84,20 @@ const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,se
         }
 
         for (let line = 0; line<lineCount; line++){
-            result.push(getLineJSXElement(line,linePosition))
+            result.push(getLineAndColumnJSXElement(line,linePosition))
             linePosition.y1 = linePosition.y1+lineSize
             linePosition.y2 = linePosition.y1
         }
 
         for (let column = 0; column<columnCount; column++){
-            result.push(getLineJSXElement(column,columnPosition))
+            result.push(getLineAndColumnJSXElement(column,columnPosition))
             columnPosition.x1 = columnPosition.x1+columnSize
             columnPosition.x2 = columnPosition.x1
         }
         return result
     }
 
-    function getLineJSXElement(index:number,linePosition:any){
+    function getLineAndColumnJSXElement(index:number,linePosition:any){
         const name = (linePosition.y1 === linePosition.y2) ? tableValues.lineNames[index] : tableValues.columnNames[index]
         const namePosition = {
             x:(linePosition.y1===linePosition.y2) ? dim.leftTable.width/2-5 : linePosition.x1-columnSize/2,
@@ -105,7 +105,7 @@ const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,se
         }
         return (name) ? [
             <line key={v4()} x1={linePosition.x1} y1={linePosition.y1} x2={linePosition.x2} y2={linePosition.y2} stroke="black"/>,
-            <foreignObject key={v4()} x={namePosition.x} y={namePosition.y-10} width={40} height={20} color="black">
+            <foreignObject key={v4()} x={namePosition.x} y={namePosition.y-10} width={50} height={30} color="black">
                 <MarkdownParser text={`$${name}$`}></MarkdownParser>
             </foreignObject>
         ] : [ <line key={v4()} x1={linePosition.x1} y1={linePosition.y1} x2={linePosition.x2} y2={linePosition.y2} stroke="black"/>,]
