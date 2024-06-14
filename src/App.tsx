@@ -21,14 +21,28 @@ function App() {
   };
 
   const [isQCM, setIsQCM] = useState(false);
+  const [isGGB, setIsGGB] = useState(false);
 
   useEffect(() => {
     const url = new URL(window.location.href);
     const exoId = url.searchParams.get("exoId");
     const qcm = url.searchParams.get("isQCM");
+    const ggb = url.searchParams.get("isGGB");
     setIsQCM(qcm === "true");
+    setIsGGB(ggb === "true");
     if (exoId) {
-      if (qcm === "true") {
+      if (ggb === "true") {
+        fetch(`http://localhost:5000/exo?exoId=${exoId}`)
+          .then((res) => res.json())
+          .then((res) => {
+            setSelectedExercise(res.exercise);
+            setQuestions(res.questions);
+
+            setNextExoId(res.nextId);
+            setPrevExoId(res.prevId);
+          })
+          .catch((err) => console.log(err));
+      } else if (qcm === "true") {
         fetch(`http://localhost:5000/qcmExo?exoId=${exoId}`)
           .then((res) => res.json())
           .then((res) => {
@@ -99,23 +113,33 @@ function App() {
       )}
       {selectedExercise?.id && (
         <div style={{ width: "100%" }}>
+          {!isGGB && (
+            <button
+              onClick={(e) =>
+                (window.location.href = window.location.href.replace("&isQCM=true","") + "&isGGB=true")
+              }
+              className="border-2 p-3"
+              >
+              Version GGB
+            </button>
+          )}
           {!isQCM && (
             <button
               onClick={(e) =>
-                (window.location.href = window.location.href + "&isQCM=true")
+                (window.location.href = window.location.href.replace("&isGGB=true","") + "&isQCM=true")
               }
               className="border-2 p-3"
             >
               Version QCM
             </button>
           )}
-          {isQCM && (
+          {isQCM || isGGB && (
             <button
               onClick={(e) =>
                 (window.location.href = window.location.href.replace(
                   "&isQCM=true",
                   ""
-                ))
+                ).replace("&isGGB=true",""))
               }
               className="border-2 p-3"
             >
@@ -151,6 +175,7 @@ function App() {
               key={index}
               index={index}
               isQCM={isQCM}
+              isGGB={isGGB}
             />
           ))}
         </div>

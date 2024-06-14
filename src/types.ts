@@ -20,11 +20,13 @@ export interface Question<TIdentifiers = {}> {
   hint?: string;
   correction?: string;
   startStatement?: string;
-  answer: string;
-  answerFormat: "tex" | "raw";
+  answer?: string;
+  answerFormat?: "tex" | "raw";
+  ggbAnswer?: string[];
   keys?: KeyId[];
   commands?: string[];
   coords?: number[];
+
   options?: {
     gridDistance?: [number, number] | false;
     hideGrid?: boolean;
@@ -35,6 +37,23 @@ export interface Question<TIdentifiers = {}> {
     is3d?: boolean;
     axisLabels?: string[];
   };
+
+  studentGgbOptions?: {
+    customToolBar?: string;
+    gridDistance?: [number, number] | false;
+    hideGrid?: boolean;
+    hideAxes?: boolean;
+    isGridBold?: boolean;
+    isGridSimple?: boolean;
+    isAxesRatioFixed?: boolean;
+    isXAxesNatural?: boolean;
+    coords?: number[];
+    xAxisSteps?: number;
+    yAxisSteps?: number;
+    enableShiftDragZoom?: boolean;
+    initialCommands?: string[];
+  };
+
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
   propositions?: Proposition[];
@@ -44,13 +63,21 @@ export type QCMGenerator<TIdentifiers> = (
   n: number,
   args: { answer: string } & TIdentifiers
 ) => Proposition[];
+
 export type VEA<TIdentifiers> = (
   studentAnswer: string,
   args: { answer: string } & TIdentifiers
 ) => boolean;
+
+export type GGBVEA<TIdentifiers> = (
+  studentAnswer: string[],
+  args: { ggbAnswer: string[] } & TIdentifiers
+) => boolean;
+
 export type QuestionGenerator<TIdentifiers = {}, TOptions = {}> = (
   opts?: TOptions
 ) => Question<TIdentifiers>;
+
 export interface Exercise<TIdentifiers = {}> {
   id: string;
   isSingleStep: boolean;
@@ -66,6 +93,7 @@ export interface Exercise<TIdentifiers = {}> {
   hasGeogebra?: boolean;
   is3d?: boolean;
   subject: "Mathématiques" | "Chimie" | "Physique";
+  isGGBAnswerValid?: GGBVEA<TIdentifiers>;
 }
 
 export type Level =

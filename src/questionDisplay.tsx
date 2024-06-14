@@ -4,19 +4,28 @@ import { useEffect, useRef, useState } from "react";
 import { AnswerDisplay } from "./answerDisplay";
 import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
-import { InlineMath } from "react-katex";
+import { InlineMath, BlockMath } from "react-katex";
+import { GGBAnswerDisplay } from "./ggbAnswerDisplay";
 
 type Props = {
   exo: Exercise;
   question: Question;
   index: number;
   isQCM: boolean;
+  isGGB: boolean;
 };
 
 export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
   const [showHint, setShowHint] = useState(false);
   const [showCorrection, setShowCorrection] = useState(false);
 
+export const QuestionDisplay = ({
+  exo,
+  question,
+  index,
+  isQCM,
+  isGGB,
+}: Props) => {
   const appletOnLoad = (app: any) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
@@ -72,7 +81,51 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       app.setAxisLabels(1, axisLabels[0], axisLabels[1]);
     }
   };
-  console.log(question);
+
+  const appletOnLoadGgbAns = (app : any) => {
+    if (!question.studentGgbOptions?.coords?.length) return;
+    
+    if (question.studentGgbOptions?.initialCommands){
+      question.studentGgbOptions.initialCommands.forEach((command)=>app.evalCommand(command))
+    } 
+
+    app.setCoordSystem(
+      ...question.studentGgbOptions?.coords
+    );
+    if (question.studentGgbOptions?.hideAxes) {
+      app.evalCommand("ShowAxes(false)");
+    }
+    if (question.studentGgbOptions?.hideGrid) {
+      app.evalCommand("ShowGrid(false)");
+    }
+
+    const gridDistance = question.studentGgbOptions?.gridDistance;
+    if (gridDistance) {
+      app.setGraphicsOptions(1, {
+        gridDistance: { x: gridDistance[0], y: gridDistance[1] },
+      });
+    }
+    const isGridBold = question.studentGgbOptions?.isGridBold;
+    if (isGridBold) {
+      app.setGraphicsOptions(1, {
+        gridIsBold: false,
+      });
+    }
+    const isGridSimple = question.studentGgbOptions?.isGridSimple;
+    if (isGridSimple) {
+      app.setGraphicsOptions(1, {
+        gridType: 0,
+      });
+    }
+    const xAxisSteps = question.studentGgbOptions?.xAxisSteps ?? 1;
+    const yAxisSteps = question.studentGgbOptions?.yAxisSteps ?? 1;
+    const defaultValue = 2;
+    app.setAxisSteps((question.studentGgbOptions?.xAxisSteps || question.studentGgbOptions?.yAxisSteps) ?  1 : defaultValue,xAxisSteps,yAxisSteps);
+
+    const enableShiftDragZoom = question.studentGgbOptions?.enableShiftDragZoom ?? false;
+    app.enableShiftDragZoom(enableShiftDragZoom);
+  }
+
   useEffect(() => {
     if (!question || index === undefined) return;
     var params = {
@@ -94,13 +147,39 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     applet.inject(`ggb-question-${index}`);
   }, [index, question]);
 
+  useEffect(() => {
+    if (!isGGB) return;
+    var params = {
+      id: `questionAnswer${index}`,
+      appName: "classic",
+      perspective: "G",
+      width: 400,
+      height: 300,
+      showToolBar: true,
+      showAlgebraInput: true,
+      showMenuBar: false,
+      customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2" ,
+      appletOnLoad: appletOnLoadGgbAns,
+      filename: (question?.studentGgbOptions?.isAxesRatioFixed === false)
+        ? "/geogebra-default-app.ggb"
+        : "/geogebra-default-ortho.ggb",
+      // filename: "/geogebra-default-app.ggb",
+      showFullscreenButton: true,
+    };
+    var applet = new window.GGBApplet(params, true);
+    applet.inject(`ggb-question-answer-${index}`);
+  }, [index, question, isGGB]);
+
   const [latex, setLatex] = useState("");
   const [veaResult, setVeaResult] = useState<boolean>();
   const [hint, setHint] = useState("");
   const [correction, setCorrection] = useState("");
+  const [ggbVeaResult,setGgbVeaResult] = useState<boolean>();
+
   useEffect(() => {
     setVeaResult(undefined);
   }, [latex]);
+
   const vea = (input: string) => {
     fetch(`http://localhost:5000/vea?exoId=${exo.id}`, {
       method: "POST",
@@ -126,6 +205,35 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     console.log(mathfieldRef.current);
     mathfieldRef.current.latex(question.answer);
   };
+
+  const onCheckGGB = () => {
+    //TODO Récupérer les objets crées par l'élève et vérifier si c'est ce qui est attendu
+
+    const app = window[`questionAnswer${index}`];
+    const commandsObj = app.getAllObjectNames().map((value:string)=>{
+      const objType = app.getObjectType(value);
+      return (objType === "point" || objType ==="vector") ? `(${app.getXcoord(value)};${app.getYcoord(value)})` : `${app.getCommandString(value)}`
+    });
+
+    fetch(`http://localhost:5000/ggbvea?exoId=${exo.id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        ggbAns: commandsObj,
+        ggbVeaProps: { ggbAnswer: question.ggbAnswer, ...question.identifiers },
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setGgbVeaResult(res.result);
+      })
+      .catch((err) => console.log(err));
+  };
+
 
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
@@ -169,10 +277,13 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       )}
       <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
-      <AnswerDisplay
+      { question.answer && <AnswerDisplay
         answer={question.answer}
         answerFormat={question.answerFormat ?? "tex"}
-      />
+      /> }
+      { question.ggbAnswer && <GGBAnswerDisplay
+        ggbAnswer={question.ggbAnswer}
+      /> }
       <div>
         <span>latex: {question.answer}</span>
         <button className="ml-3 border" onClick={onCopyLatex}>
@@ -219,7 +330,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           ))}
         </>
       )}
-      {!isQCM && (
+      {!isQCM && !isGGB && (
         <>
           <p>Clavier : </p>
           <MathInput
@@ -242,6 +353,17 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
           </div>
           <p>latex: {latex}</p>
           <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
+        </>
+      )}
+      {isGGB && (
+        <>
+          <div id={`ggb-question-answer-${index}`}></div>
+          <button className="ml-3 border" onClick={onCheckGGB}>
+            Check
+          </button>
+          {ggbVeaResult !== undefined && (
+              <span>{ggbVeaResult ? "OK!" : "Non"}</span>
+          )}
         </>
       )}
     </div>
