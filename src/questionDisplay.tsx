@@ -22,7 +22,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
 
-    if (question.options?.is3D) {
+    if (question.options?.is3d) {
       // Gestion des coordonnées en 3D
       app.setCoordSystem(
         question.coords[0],
@@ -72,12 +72,13 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       app.setAxisLabels(1, axisLabels[0], axisLabels[1]);
     }
   };
-
+  console.log(question);
   useEffect(() => {
+    if (!question || index === undefined) return;
     var params = {
       id: `question${index}`,
       appName: "classic",
-      perspective: question.options?.is3D ? "T" : "G",
+      perspective: question.options?.is3d ? "T" : "G",
       width: 400,
       height: 300,
       showToolBar: false,
@@ -95,8 +96,8 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
 
   const [latex, setLatex] = useState("");
   const [veaResult, setVeaResult] = useState<boolean>();
-  const [hint,setHint] = useState("");
-  const [correction,setCorrection] = useState("");
+  const [hint, setHint] = useState("");
+  const [correction, setCorrection] = useState("");
   useEffect(() => {
     setVeaResult(undefined);
   }, [latex]);
@@ -180,13 +181,29 @@ export const QuestionDisplay = ({ exo, question, index, isQCM }: Props) => {
       </div>
       {question?.hint && (
         <>
-          <button className="border mx-3" onClick={()=>hint==="" ? setHint(question.hint!) : setHint("")}>Indice!</button>
+          <button
+            className="border mx-3"
+            onClick={() =>
+              hint === "" ? setHint(question.hint!) : setHint("")
+            }
+          >
+            Indice!
+          </button>
           <MarkdownParser text={hint}></MarkdownParser>
         </>
       )}
       {question?.correction && (
         <>
-          <button className="border mx-3" onClick={()=>correction==="" ? setCorrection(question.correction!) : setCorrection("")}>Correction !</button>
+          <button
+            className="border mx-3"
+            onClick={() =>
+              correction === ""
+                ? setCorrection(question.correction!)
+                : setCorrection("")
+            }
+          >
+            Correction !
+          </button>
           <MarkdownParser text={correction}></MarkdownParser>
         </>
       )}
