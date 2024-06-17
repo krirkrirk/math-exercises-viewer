@@ -55,7 +55,7 @@ const ValuesDisplay = ({tableValues,setStudentTable}:{tableValues:TableValues,se
 
     const [values,setValues] = useState<string[][]>(copyMatrix(tableValues.values))
 
-    useEffect(()=>setStudentTable((prev)=>values),[values])
+    useEffect(()=>setStudentTable(values),[values])
     useEffect(()=>setValues(copyMatrix(tableValues.values)),[tableValues.values])
 
 
