@@ -165,8 +165,6 @@ export const QuestionDisplay = ({ exo, question, index, isQCM,isGGB }: Props) =>
 
   const [latex, setLatex] = useState("");
   const [veaResult, setVeaResult] = useState<boolean>();
-  const [hint, setHint] = useState("");
-  const [correction, setCorrection] = useState("");
   const [ggbVeaResult,setGgbVeaResult] = useState<boolean>();
 
   useEffect(() => {
@@ -233,6 +231,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM,isGGB }: Props) =>
       {question.instruction && (
         <MarkdownParser text={question.instruction}></MarkdownParser>
       )}
+
       {question.hint && (
         <div>
           <button
