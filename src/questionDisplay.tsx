@@ -15,20 +15,15 @@ type Props = {
   isGGB: boolean;
 };
 
-export const QuestionDisplay = ({
-  exo,
-  question,
-  index,
-  isQCM,
-  isGGB,
-}: Props) => {
+export const QuestionDisplay = ({ exo, question, index, isQCM,isGGB }: Props) => {
   const [showHint, setShowHint] = useState(false);
   const [showCorrection, setShowCorrection] = useState(false);
-
+  
   const appletOnLoad = (app: any) => {
     if (!question.commands?.length) return;
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
+
     if (question.options?.is3D) {
       // Gestion des coordonnées en 3D
       app.setCoordSystem(
@@ -80,16 +75,16 @@ export const QuestionDisplay = ({
     }
   };
 
-  const appletOnLoadGgbAns = (app: any) => {
+  const appletOnLoadGgbAns = (app : any) => {
     if (!question.studentGgbOptions?.coords?.length) return;
+    
+    if (question.studentGgbOptions?.initialCommands){
+      question.studentGgbOptions.initialCommands.forEach((command)=>app.evalCommand(command))
+    } 
 
-    if (question.studentGgbOptions?.initialCommands) {
-      question.studentGgbOptions.initialCommands.forEach((command) =>
-        app.evalCommand(command)
-      );
-    }
-
-    app.setCoordSystem(...question.studentGgbOptions?.coords);
+    app.setCoordSystem(
+      ...question.studentGgbOptions?.coords
+    );
     if (question.studentGgbOptions?.hideAxes) {
       app.evalCommand("ShowAxes(false)");
     }
@@ -118,19 +113,11 @@ export const QuestionDisplay = ({
     const xAxisSteps = question.studentGgbOptions?.xAxisSteps ?? 1;
     const yAxisSteps = question.studentGgbOptions?.yAxisSteps ?? 1;
     const defaultValue = 2;
-    app.setAxisSteps(
-      question.studentGgbOptions?.xAxisSteps ||
-        question.studentGgbOptions?.yAxisSteps
-        ? 1
-        : defaultValue,
-      xAxisSteps,
-      yAxisSteps
-    );
+    app.setAxisSteps((question.studentGgbOptions?.xAxisSteps || question.studentGgbOptions?.yAxisSteps) ?  1 : defaultValue,xAxisSteps,yAxisSteps);
 
-    const enableShiftDragZoom =
-      question.studentGgbOptions?.enableShiftDragZoom ?? false;
+    const enableShiftDragZoom = question.studentGgbOptions?.enableShiftDragZoom ?? false;
     app.enableShiftDragZoom(enableShiftDragZoom);
-  };
+  }
 
   useEffect(() => {
     if (!question || index === undefined) return;
@@ -151,7 +138,7 @@ export const QuestionDisplay = ({
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
-  }, [index, question]);
+  }, [index, question,isGGB]);
 
   useEffect(() => {
     if (!isGGB) return;
@@ -164,12 +151,11 @@ export const QuestionDisplay = ({
       showToolBar: true,
       showAlgebraInput: true,
       showMenuBar: false,
-      customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2",
+      customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2" ,
       appletOnLoad: appletOnLoadGgbAns,
-      filename:
-        question?.studentGgbOptions?.isAxesRatioFixed === false
-          ? "/geogebra-default-app.ggb"
-          : "/geogebra-default-ortho.ggb",
+      filename: (question?.studentGgbOptions?.isAxesRatioFixed === false)
+        ? "/geogebra-default-app.ggb"
+        : "/geogebra-default-ortho.ggb",
       // filename: "/geogebra-default-app.ggb",
       showFullscreenButton: true,
     };
@@ -181,7 +167,7 @@ export const QuestionDisplay = ({
   const [veaResult, setVeaResult] = useState<boolean>();
   const [hint, setHint] = useState("");
   const [correction, setCorrection] = useState("");
-  const [ggbVeaResult, setGgbVeaResult] = useState<boolean>();
+  const [ggbVeaResult,setGgbVeaResult] = useState<boolean>();
 
   useEffect(() => {
     setVeaResult(undefined);
@@ -217,11 +203,9 @@ export const QuestionDisplay = ({
     //TODO Récupérer les objets crées par l'élève et vérifier si c'est ce qui est attendu
 
     const app = window[`questionAnswer${index}`];
-    const commandsObj = app.getAllObjectNames().map((value: string) => {
+    const commandsObj = app.getAllObjectNames().map((value:string)=>{
       const objType = app.getObjectType(value);
-      return objType === "point" || objType === "vector"
-        ? `(${app.getXcoord(value)};${app.getYcoord(value)})`
-        : `${app.getCommandString(value)}`;
+      return (objType === "point" || objType ==="vector") ? `(${app.getXcoord(value)};${app.getYcoord(value)})` : `${app.getCommandString(value)}`
     });
 
     fetch(`http://localhost:5000/ggbvea?exoId=${exo.id}`, {
@@ -242,6 +226,7 @@ export const QuestionDisplay = ({
       })
       .catch((err) => console.log(err));
   };
+
 
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
@@ -285,49 +270,19 @@ export const QuestionDisplay = ({
       )}
       <p>Coords : {question.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
-      {question.answer && (
-        <AnswerDisplay
-          answer={question.answer}
-          answerFormat={question.answerFormat ?? "tex"}
-        />
-      )}
-      {question.ggbAnswer && (
-        <GGBAnswerDisplay ggbAnswer={question.ggbAnswer} />
-      )}
+      { question.answer && <AnswerDisplay
+        answer={question.answer}
+        answerFormat={question.answerFormat ?? "tex"}
+      /> }
+      { question.ggbAnswer && <GGBAnswerDisplay
+        ggbAnswer={question.ggbAnswer}
+      /> }
       <div>
         <span>latex: {question.answer}</span>
         <button className="ml-3 border" onClick={onCopyLatex}>
           Copy
         </button>
       </div>
-      {question?.hint && (
-        <>
-          <button
-            className="border mx-3"
-            onClick={() =>
-              hint === "" ? setHint(question.hint!) : setHint("")
-            }
-          >
-            Indice!
-          </button>
-          <MarkdownParser text={hint}></MarkdownParser>
-        </>
-      )}
-      {question?.correction && (
-        <>
-          <button
-            className="border mx-3"
-            onClick={() =>
-              correction === ""
-                ? setCorrection(question.correction!)
-                : setCorrection("")
-            }
-          >
-            Correction !
-          </button>
-          <MarkdownParser text={correction}></MarkdownParser>
-        </>
-      )}
       {question?.propositions && (
         <>
           <p>Propositions : </p>
@@ -372,7 +327,7 @@ export const QuestionDisplay = ({
             Check
           </button>
           {ggbVeaResult !== undefined && (
-            <span>{ggbVeaResult ? "OK!" : "Non"}</span>
+              <span>{ggbVeaResult ? "OK!" : "Non"}</span>
           )}
         </>
       )}
