@@ -323,7 +323,7 @@ export const QuestionDisplay = ({ exo, question, index, isQCM,isGGB }: Props) =>
         <>
           <div id={`ggb-question-answer-${index}`}></div>
           <button className="ml-3 border" onClick={onCheckGGB}>
-            Check
+            Check GGBVea
           </button>
           {ggbVeaResult !== undefined && (
               <span>{ggbVeaResult ? "OK!" : "Non"}</span>
