@@ -30,7 +30,7 @@ export const QuestionDisplay = ({
     question.commands.forEach((command) => app.evalCommand(command));
     if (!question.coords?.length) return;
 
-    if (question.options?.is3d) {
+    if (question.options?.is3D) {
       // Gestion des coordonnées en 3D
       app.setCoordSystem(
         question.coords[0],
@@ -138,7 +138,7 @@ export const QuestionDisplay = ({
     var params = {
       id: `question${index}`,
       appName: "classic",
-      perspective: question.options?.is3d ? "T" : "G",
+      perspective: question.options?.is3D ? "T" : "G",
       width: 400,
       height: 300,
       showToolBar: false,
@@ -152,7 +152,7 @@ export const QuestionDisplay = ({
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
-  }, [index, question]);
+  }, [index, question, isGGB]);
 
   useEffect(() => {
     if (!isGGB) return;
@@ -249,6 +249,7 @@ export const QuestionDisplay = ({
       {question.instruction && (
         <MarkdownParser text={question.instruction}></MarkdownParser>
       )}
+
       {question.hint && (
         <div>
           <button
@@ -301,34 +302,6 @@ export const QuestionDisplay = ({
           Copy
         </button>
       </div>
-      {question?.hint && (
-        <>
-          <button
-            className="border mx-3"
-            onClick={() =>
-              hint === "" ? setHint(question.hint!) : setHint("")
-            }
-          >
-            Indice!
-          </button>
-          <MarkdownParser text={hint}></MarkdownParser>
-        </>
-      )}
-      {question?.correction && (
-        <>
-          <button
-            className="border mx-3"
-            onClick={() =>
-              correction === ""
-                ? setCorrection(question.correction!)
-                : setCorrection("")
-            }
-          >
-            Correction !
-          </button>
-          <MarkdownParser text={correction}></MarkdownParser>
-        </>
-      )}
       {question?.propositions && (
         <>
           <p>Propositions : </p>
@@ -370,7 +343,7 @@ export const QuestionDisplay = ({
         <>
           <div id={`ggb-question-answer-${index}`}></div>
           <button className="ml-3 border" onClick={onCheckGGB}>
-            Check
+            Check GGBVea
           </button>
           {ggbVeaResult !== undefined && (
             <span>{ggbVeaResult ? "OK!" : "Non"}</span>

@@ -133,7 +133,7 @@ function App() {
               Version QCM
             </button>
           )}
-          {isQCM || isGGB && (
+          {(isQCM || isGGB) && (
             <button
               onClick={(e) =>
                 (window.location.href = window.location.href.replace(

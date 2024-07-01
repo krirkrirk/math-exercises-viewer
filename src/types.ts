@@ -34,7 +34,7 @@ export interface Question<TIdentifiers = {}> {
     isGridBold?: boolean;
     isGridSimple?: boolean;
     isAxesRatioFixed?: boolean;
-    is3d?: boolean;
+    is3D?: boolean;
     axisLabels?: string[];
   };
 
@@ -91,7 +91,7 @@ export interface Exercise<TIdentifiers = {}> {
   getPropositions?: QCMGenerator<{ answer: string } & TIdentifiers>;
   isAnswerValid?: VEA<TIdentifiers>;
   hasGeogebra?: boolean;
-  is3d?: boolean;
+  is3D?: boolean;
   subject: "Mathématiques" | "Chimie" | "Physique";
   isGGBAnswerValid?: GGBVEA<TIdentifiers>;
 }
