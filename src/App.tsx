@@ -92,8 +92,20 @@ function App() {
     <div className="App" style={{ width: "90vw", padding: "50px" }}>
       {!!allExercises.length && (
         <div>
-          <p>{exoCount} Générateurs</p>
-          <div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <p>{exoCount} Générateurs</p>
+            <div
+              style={{
+                backgroundColor: "red",
+                width: "1rem",
+                height: "0.5rem",
+                marginLeft: "2rem",
+                marginRight: "0.5rem",
+              }}
+            ></div>
+            <p> : Premium</p>
+          </div>
+          <div style={{ display: "flex", columnGap: "1rem" }}>
             <button onClick={(e) => setDisplayType("all")}>Tous</button>
             <button onClick={(e) => setDisplayType("byLevel")}>Niveaux</button>
             <button onClick={(e) => setDisplayType("bySection")}>
