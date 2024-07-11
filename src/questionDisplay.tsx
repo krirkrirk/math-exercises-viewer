@@ -131,6 +131,11 @@ export const QuestionDisplay = ({
     const enableShiftDragZoom =
       question.studentGgbOptions?.enableShiftDragZoom ?? false;
     app.enableShiftDragZoom(enableShiftDragZoom);
+
+    const axisLabels = question.studentGgbOptions?.axisLabels;
+    if (axisLabels) {
+      app.setAxisLabels(1, axisLabels[0], axisLabels[1]);
+    }
   };
 
   useEffect(() => {
