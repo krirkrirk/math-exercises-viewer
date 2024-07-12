@@ -52,6 +52,7 @@ export interface Question<TIdentifiers = {}> {
     yAxisSteps?: number;
     enableShiftDragZoom?: boolean;
     initialCommands?: string[];
+    axisLabels?: string[];
   };
 
   divisionFormat?: "fraction" | "obelus";
