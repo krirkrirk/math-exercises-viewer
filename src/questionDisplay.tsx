@@ -226,7 +226,7 @@ export const QuestionDisplay = ({
     const commandsObj = app.getAllObjectNames().map((value: string) => {
       const objType = app.getObjectType(value);
       return objType === "point" || objType === "vector"
-        ? `(${app.getXcoord(value)};${app.getYcoord(value)})`
+        ? `(${app.getXcoord(value)},${app.getYcoord(value)})`
         : `${app.getCommandString(value)}`;
     });
 
