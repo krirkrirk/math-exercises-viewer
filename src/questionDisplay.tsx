@@ -254,7 +254,12 @@ export const QuestionDisplay = ({
       {question.instruction && (
         <MarkdownParser text={question.instruction}></MarkdownParser>
       )}
-
+      <button
+        onClick={() => navigator.clipboard.writeText(question.instruction)}
+        className="border mb-2"
+      >
+        {"Copier l'instruction"}
+      </button>
       {question.hint && (
         <div>
           <button
