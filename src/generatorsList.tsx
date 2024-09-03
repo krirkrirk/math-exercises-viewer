@@ -43,7 +43,7 @@ export const GeneratorsList = ({
               <div
                 key={generator.id}
                 style={{
-                  backgroundColor: generator.isPremium ? "red" : "",
+                  backgroundColor: generator.hasHintAndCorrection ? "red" : "",
                 }}
               >
                 <MarkdownParser text={generator.label}></MarkdownParser>
