@@ -225,9 +225,9 @@ export const QuestionDisplay = ({
     const app = window[`questionAnswer${index}`];
     const commandsObj = app.getAllObjectNames().map((value: string) => {
       const objType = app.getObjectType(value);
-      return objType === "point" || objType === "vector"
-        ? `(${app.getXcoord(value)},${app.getYcoord(value)})`
-        : `${app.getCommandString(value)}`;
+      return objType === "point"
+        ? `${value}=(${app.getXcoord(value)},${app.getYcoord(value)})`
+        : `${value}=${app.getCommandString(value)}`;
     });
 
     fetch(`http://localhost:5000/ggbvea?exoId=${exo.id}`, {

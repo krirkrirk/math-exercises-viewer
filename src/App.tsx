@@ -30,6 +30,8 @@ function App() {
     const ggb = url.searchParams.get("isGGB");
     setIsQCM(qcm === "true");
     setIsGGB(ggb === "true");
+    const isMathlive = url.pathname.includes("mathlive");
+    const isXplive = url.pathname.includes("xplive");
     if (exoId) {
       if (ggb === "true") {
         fetch(`http://localhost:5000/exo?exoId=${exoId}`)
@@ -65,13 +67,31 @@ function App() {
           .catch((err) => console.log(err));
       }
     } else {
-      fetch("http://localhost:5000")
-        .then((res) => res.json())
-        .then((res) => {
-          setAllExercises(res);
-          setExoCount(res.length);
-        })
-        .catch((err) => console.log(err));
+      if (isMathlive) {
+        fetch("http://localhost:5000/mathlive")
+          .then((res) => res.json())
+          .then((res) => {
+            setAllExercises(res);
+            setExoCount(res.length);
+          })
+          .catch((err) => console.log(err));
+      } else if (isXplive) {
+        fetch("http://localhost:5000/xplive")
+          .then((res) => res.json())
+          .then((res) => {
+            setAllExercises(res);
+            setExoCount(res.length);
+          })
+          .catch((err) => console.log(err));
+      } else {
+        fetch("http://localhost:5000")
+          .then((res) => res.json())
+          .then((res) => {
+            setAllExercises(res);
+            setExoCount(res.length);
+          })
+          .catch((err) => console.log(err));
+      }
     }
   }, []);
 
@@ -128,17 +148,21 @@ function App() {
           {!isGGB && (
             <button
               onClick={(e) =>
-                (window.location.href = window.location.href.replace("&isQCM=true","") + "&isGGB=true")
+                (window.location.href =
+                  window.location.href.replace("&isQCM=true", "") +
+                  "&isGGB=true")
               }
               className="border-2 p-3"
-              >
+            >
               Version GGB
             </button>
           )}
           {!isQCM && (
             <button
               onClick={(e) =>
-                (window.location.href = window.location.href.replace("&isGGB=true","") + "&isQCM=true")
+                (window.location.href =
+                  window.location.href.replace("&isGGB=true", "") +
+                  "&isQCM=true")
               }
               className="border-2 p-3"
             >
@@ -148,10 +172,9 @@ function App() {
           {(isQCM || isGGB) && (
             <button
               onClick={(e) =>
-                (window.location.href = window.location.href.replace(
-                  "&isQCM=true",
-                  ""
-                ).replace("&isGGB=true",""))
+                (window.location.href = window.location.href
+                  .replace("&isQCM=true", "")
+                  .replace("&isGGB=true", ""))
               }
               className="border-2 p-3"
             >
