@@ -56,7 +56,9 @@ export const QuestionDisplay = ({
       showAlgebraInput: false,
       showMenuBar: false,
       appletOnLoad: appletOnLoad,
-      filename: "/geogebra-default-ortho.ggb",
+      filename: question.ggbOptions?.lockedAxesRatio
+        ? "/geogebra-default-ortho.ggb"
+        : "/geogebra-default-app.ggb",
       showFullscreenButton: true,
     };
     var applet = new window.GGBApplet(params, true);
@@ -76,8 +78,9 @@ export const QuestionDisplay = ({
       showMenuBar: false,
       customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2",
       appletOnLoad: appletOnLoadGgbAns,
-      filename: "/geogebra-default-ortho.ggb",
-      // filename: "/geogebra-default-app.ggb",
+      filename: question.ggbOptions?.lockedAxesRatio
+        ? "/geogebra-default-ortho.ggb"
+        : "/geogebra-default-app.ggb",
       showFullscreenButton: true,
     };
     var applet = new window.GGBApplet(params, true);
@@ -128,7 +131,7 @@ export const QuestionDisplay = ({
       const objType = app.getObjectType(value);
       return objType === "point"
         ? `${value}=(${app.getXcoord(value)},${app.getYcoord(value)})`
-        : `${value}=${app.getCommandString(value)}`;
+        : `${value}=${app.getCommandString(value, false)}`;
     });
 
     fetch(`http://localhost:5000/ggbvea?exoId=${exo.id}`, {
@@ -149,14 +152,15 @@ export const QuestionDisplay = ({
       })
       .catch((err) => console.log(err));
   };
-  const onTestXml = () => {
-    // const app = window[`questionAnswer${index}`];
-    // const xml = app.getXML();
+  const getXML = () => {
+    const app = window[`question${index}`];
+    const xml = app.getXML();
     // const newXML = xml.replace(
     //   /<axis id="1" .*?\/>/g,
     //   '<axis id="1" show="true" label="" unitLabel="" tickStyle="1" showNumbers="false"/>'
     // );
-    // console.log(newXML);
+    console.log(xml);
+    console.log(question.ggbOptions);
     // console.log(app.setXML(newXML));
   };
 
@@ -164,6 +168,9 @@ export const QuestionDisplay = ({
     <div className="border-white  bg-gray-900 p-3 m-2">
       {question.instruction && (
         <MarkdownParser text={question.instruction}></MarkdownParser>
+      )}
+      {question.ggbOptions?.coords.length && (
+        <button onClick={getXML}>XML</button>
       )}
       <button
         onClick={() => navigator.clipboard.writeText(question.instruction)}
@@ -268,7 +275,6 @@ export const QuestionDisplay = ({
           <button className="ml-3 border" onClick={onCheckGGB}>
             Check GGBVea
           </button>
-          <button onClick={onTestXml}>TEst xml</button>
           {ggbVeaResult !== undefined && (
             <span>{ggbVeaResult ? "OK!" : "Non"}</span>
           )}

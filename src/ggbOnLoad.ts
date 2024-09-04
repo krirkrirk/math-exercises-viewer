@@ -5,6 +5,27 @@ export const ggbOnLoad = (app: any, ggbOptions: GeogebraOptions) => {
   ggbOptions.commands.forEach((command) => app.evalCommand(command));
   if (!ggbOptions.coords?.length) return;
 
+  let willChangeXML = false;
+  let xml = "";
+  let newXML = "";
+
+  if (ggbOptions.lockedAxesRatio !== 1) {
+    console.log(ggbOptions.lockedAxesRatio);
+    willChangeXML = true;
+    xml = app.getXML();
+    if (ggbOptions.lockedAxesRatio) {
+      newXML = xml.replace(
+        /lockedAxesRatio="1"/g,
+        `lockedAxesRatio="${ggbOptions.lockedAxesRatio}"`
+      );
+    } else {
+      newXML = xml.replace(/lockedAxesRatio="1"/g, " ");
+    }
+    // newXML = xml.replace(/showNumbers="true"/g, 'showNumbers="false"');
+    console.log(newXML);
+    app.setXML(newXML);
+  }
+
   if (ggbOptions.is3D) {
     // Gestion des coordonnées en 3D
     app.setCoordSystem(
