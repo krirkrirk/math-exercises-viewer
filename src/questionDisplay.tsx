@@ -250,118 +250,163 @@ export const QuestionDisplay = ({
   };
 
   return (
-    <div className="border-white  bg-gray-900 p-3 m-2">
-      {question.instruction && (
-        <MarkdownParser text={question.instruction}></MarkdownParser>
-      )}
-      <button
-        onClick={() => navigator.clipboard.writeText(question.instruction)}
-        className="border mb-2"
-      >
-        {"Copier l'instruction"}
-      </button>
-      {question.hint && (
-        <div>
-          <button
-            onClick={() => setShowHint(!showHint)}
-            className="border mb-2"
-          >
-            {showHint ? "Masquer l'indice" : "Afficher l'indice"}
-          </button>
-          {showHint && <MarkdownParser text={question.hint}></MarkdownParser>}
-        </div>
-      )}
-      {question.correction && (
-        <div>
-          <button
-            onClick={() => setShowCorrection(!showCorrection)}
-            className="border mb-2"
-          >
-            {showCorrection
-              ? "Masquer la correction"
-              : "Afficher la correction"}
-          </button>
-          {showCorrection && (
-            <MarkdownParser text={question.correction}></MarkdownParser>
-          )}
-        </div>
-      )}
-
-      {question.startStatement && (
-        <div className="pt-2">
-          <InlineMath math={`${question.startStatement} ${exo.connector!} ?`} />
-        </div>
-      )}
-      {question.commands?.length && (
-        <>
-          <div id={`ggb-question-${index}`}></div>
-        </>
-      )}
-      <p>Coords : {question.coords?.join(";")}</p>
-      <p>Réponse attendue : </p>
-      {question.answer && (
-        <AnswerDisplay
-          answer={question.answer}
-          answerFormat={question.answerFormat ?? "tex"}
-        />
-      )}
-      {question.ggbAnswer && (
-        <GGBAnswerDisplay ggbAnswer={question.ggbAnswer} />
-      )}
-      <div className="pt-2">
-        <span>latex: {question.answer}</span>
-        <button className="ml-3 border" onClick={onCopyLatex}>
-          Copy
-        </button>
-      </div>
-      {question?.propositions && (
-        <>
-          <p>Propositions : </p>
-          {question?.propositions?.map((prop) => (
-            <AnswerDisplay
-              key={prop.id}
-              answer={prop.statement}
-              answerFormat={prop.format ?? "tex"}
-            />
-          ))}
-        </>
-      )}
-      {!isQCM && !isGGB && (
-        <>
-          <p>Clavier : </p>
-          <MathInput
-            numericToolbarKeys={question.keys}
-            setValue={setLatex}
-            setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
-            forbidOtherKeyboardKeys={true}
-          />
-          <p>
-            bonne réponse officielle :{" "}
-            {formatLatex(latex) === question.answer ? "OUI" : "NON"}
-          </p>
-          <div className="mx-3">
-            <button onClick={() => vea(latex)} className="border mx-3">
-              check vea
+    <div className="border-gray-800 border-solid border bg-gray-900 p-3 mt-2 grid grid-cols-3">
+      <div className="pr-8 pl-2 py-1 mr-8 col-span-2 border-solid border-transparent border-r-2 border-r-gray-700">
+        {question.instruction && (
+          <div className="flex items-start gap-x-2">
+            <div style={{ maxWidth: "350px" }}>
+              <MarkdownParser text={question.instruction}></MarkdownParser>
+            </div>
+            <button
+              onClick={() =>
+                navigator.clipboard.writeText(question.instruction)
+              }
+              className="border mb-2"
+            >
+              {"Copier"}
             </button>
-            {veaResult !== undefined && (
-              <span>{veaResult ? "OK!" : "Non"}</span>
-            )}
           </div>
-          <p>latex: {latex}</p>
-          <p>Identiifers : {JSON.stringify(question.identifiers)}</p>
-        </>
-      )}
-      {isGGB && (
-        <>
-          <div id={`ggb-question-answer-${index}`}></div>
-          <button className="ml-3 border" onClick={onCheckGGB}>
-            Check GGBVea
+        )}
+        {question.startStatement && (
+          <div className="mt-4">
+            <InlineMath
+              math={`${question.startStatement} ${exo.connector!} ?`}
+            />
+          </div>
+        )}
+        {(question.hint || question.correction) && (
+          <div className="mt-6">
+            <div className="flex gap-x-2">
+              <button
+                onClick={() => setShowHint(!showHint)}
+                className="border mb-2"
+              >
+                {showHint ? "Masquer l'indice" : "Afficher l'indice"}
+              </button>
+              <button
+                onClick={() => setShowCorrection(!showCorrection)}
+                className="border mb-2"
+              >
+                {showCorrection
+                  ? "Masquer la correction"
+                  : "Afficher la correction"}
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-x-8">
+              <div>
+                {showHint && (
+                  <MarkdownParser text={question.hint}></MarkdownParser>
+                )}
+              </div>
+              <div>
+                {showCorrection && (
+                  <MarkdownParser text={question.correction}></MarkdownParser>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {question.commands?.length && (
+          <>
+            <div id={`ggb-question-${index}`}></div>
+          </>
+        )}
+
+        {!isQCM && !isGGB && (
+          <>
+            <p className="mb-1 text-gray-500">Clavier : </p>{" "}
+            <MathInput
+              numericToolbarKeys={question.keys}
+              setValue={setLatex}
+              setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
+              forbidOtherKeyboardKeys={true}
+            />
+            <div className="flex justify-between gap-x-3">
+              <p className="mt-1 mb-0">
+                <span className="text-gray-500">
+                  Bonne réponse officielle ?{" "}
+                </span>
+                {formatLatex(latex) === question.answer ? "✅" : "❌"}
+              </p>
+              <div className=" mt-1">
+                <button onClick={() => vea(latex)} className="border ">
+                  check vea
+                </button>
+                {veaResult !== undefined && (
+                  <span className="ml-1">{veaResult ? "✅" : "❌"}</span>
+                )}
+              </div>
+            </div>
+            <p className="mt-0">
+              <span className="text-gray-500">latex : </span>
+              {latex}
+            </p>
+          </>
+        )}
+        {isGGB && (
+          <>
+            <div id={`ggb-question-answer-${index}`}></div>
+            <button className=" border" onClick={onCheckGGB}>
+              Check GGBVea
+            </button>
+            {ggbVeaResult !== undefined && (
+              <span className="ml-1">{ggbVeaResult ? "✅" : "❌"}</span>
+            )}
+          </>
+        )}
+        {question?.propositions && (
+          <>
+            <p className="text-gray-500 mb-1">Propositions : </p>
+            <div className="flex flex-col gap-y-1">
+              {question?.propositions?.map((prop) => (
+                <div
+                  key={prop.id}
+                  className="border border-solid border-gray-500 px-3 py-2"
+                  style={{ maxWidth: 350 }}
+                >
+                  <AnswerDisplay
+                    answer={prop.statement}
+                    answerFormat={prop.format ?? "tex"}
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <div style={{ maxWidth: "350px" }}>
+        <p>
+          <span className="text-gray-500">Identifiers :</span>{" "}
+          {JSON.stringify(question.identifiers)}
+        </p>
+
+        {question?.coords && (
+          <p>
+            <span className="text-gray-500">Coords :</span>{" "}
+            {question.coords?.join(";")}
+          </p>
+        )}
+        <p className="text-gray-500 mb-1">Réponse attendue : </p>
+        {question.answer && (
+          <AnswerDisplay
+            answer={question.answer}
+            answerFormat={question.answerFormat ?? "tex"}
+          />
+        )}
+        {question.ggbAnswer && (
+          <GGBAnswerDisplay ggbAnswer={question.ggbAnswer} />
+        )}
+
+        <div className="mt-2">
+          <span>
+            <span className="text-gray-500">latex :</span> {question.answer}
+          </span>
+          <button className="ml-3 border" onClick={onCopyLatex}>
+            Copy
           </button>
-          {ggbVeaResult !== undefined && (
-            <span>{ggbVeaResult ? "OK!" : "Non"}</span>
-          )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 };
