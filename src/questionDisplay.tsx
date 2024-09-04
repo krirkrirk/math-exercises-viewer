@@ -6,6 +6,8 @@ import MathInput from "react-math-keyboard";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
 import { GGBAnswerDisplay } from "./ggbAnswerDisplay";
+import { ggbOnLoad } from "./ggbOnLoad";
+import { ggbStudentAnswerOnLoad } from "./ggbStudentAnswerOnLoad";
 
 type Props = {
   exo: Exercise;
@@ -26,116 +28,20 @@ export const QuestionDisplay = ({
   const [showCorrection, setShowCorrection] = useState(false);
 
   const appletOnLoad = (app: any) => {
-    if (!question.commands?.length) return;
-    question.commands.forEach((command) => app.evalCommand(command));
-    if (!question.coords?.length) return;
-
-    if (question.options?.is3D) {
-      // Gestion des coordonnées en 3D
-      app.setCoordSystem(
-        question.coords[0],
-        question.coords[1],
-        question.coords[2],
-        question.coords[3],
-        question.coords[4],
-        question.coords[5]
-      );
-    } else {
-      // Gestion des coordonnées en 2D
-      app.setCoordSystem(
-        question.coords[0],
-        question.coords[1],
-        question.coords[2],
-        question.coords[3]
-      );
-    }
-
-    if (question.options?.hideAxes) {
-      app.evalCommand("ShowAxes(false)");
-    }
-    if (question.options?.hideGrid) {
-      app.evalCommand("ShowGrid(false)");
-    }
-
-    const gridDistance = question.options?.gridDistance;
-    if (gridDistance) {
-      app.setGraphicsOptions(1, {
-        gridDistance: { x: gridDistance[0], y: gridDistance[1] },
-      });
-    }
-    const isGridBold = question.options?.isGridBold;
-    if (isGridBold) {
-      app.setGraphicsOptions(1, {
-        gridIsBold: false,
-      });
-    }
-    const isGridSimple = question.options?.isGridSimple;
-    if (isGridSimple) {
-      app.setGraphicsOptions(1, {
-        gridType: 0,
-      });
-    }
-    const axisLabels = question.options?.axisLabels;
-    if (axisLabels) {
-      app.setAxisLabels(1, axisLabels[0], axisLabels[1]);
-    }
+    ggbOnLoad(app, question.ggbOptions!);
   };
 
   const appletOnLoadGgbAns = (app: any) => {
-    if (!question.studentGgbOptions?.coords?.length) return;
+    // const xml = app.getXML();
 
-    if (question.studentGgbOptions?.initialCommands) {
-      question.studentGgbOptions.initialCommands.forEach((command) =>
-        app.evalCommand(command)
-      );
-    }
-
-    app.setCoordSystem(...question.studentGgbOptions?.coords);
-    if (question.studentGgbOptions?.hideAxes) {
-      app.evalCommand("ShowAxes(false)");
-    }
-    if (question.studentGgbOptions?.hideGrid) {
-      app.evalCommand("ShowGrid(false)");
-    }
-
-    const gridDistance = question.studentGgbOptions?.gridDistance;
-    if (gridDistance) {
-      app.setGraphicsOptions(1, {
-        gridDistance: { x: gridDistance[0], y: gridDistance[1] },
-      });
-    }
-    const isGridBold = question.studentGgbOptions?.isGridBold;
-    if (isGridBold) {
-      app.setGraphicsOptions(1, {
-        gridIsBold: false,
-      });
-    }
-    const isGridSimple = question.studentGgbOptions?.isGridSimple;
-    if (isGridSimple) {
-      app.setGraphicsOptions(1, {
-        gridType: 0,
-      });
-    }
-    const xAxisSteps = question.studentGgbOptions?.xAxisSteps ?? 1;
-    const yAxisSteps = question.studentGgbOptions?.yAxisSteps ?? 1;
-    const defaultValue = 2;
-    app.setAxisSteps(
-      question.studentGgbOptions?.xAxisSteps ||
-        question.studentGgbOptions?.yAxisSteps
-        ? 1
-        : defaultValue,
-      xAxisSteps,
-      yAxisSteps
-    );
-
-    const enableShiftDragZoom =
-      question.studentGgbOptions?.enableShiftDragZoom ?? false;
-    app.enableShiftDragZoom(enableShiftDragZoom);
-
-    const axisLabels = question.studentGgbOptions?.axisLabels;
-    if (axisLabels) {
-      app.setAxisLabels(1, axisLabels[0], axisLabels[1]);
-    }
+    // const newXML = xml.replace(
+    //   /<axis id="1" .*?\/>/g,
+    //   '<axis id="1" show="true" label="" unitLabel="" tickStyle="2" showNumbers="false"/>'
+    // );
+    // console.log(newXML);
+    // console.log(app.setXML(newXML));
+    console.log(question.studentGgbOptions);
+    ggbStudentAnswerOnLoad(app, question.studentGgbOptions!);
   };
 
   useEffect(() => {
@@ -143,16 +49,14 @@ export const QuestionDisplay = ({
     var params = {
       id: `question${index}`,
       appName: "classic",
-      perspective: question.options?.is3D ? "T" : "G",
+      perspective: question.ggbOptions?.is3D ? "T" : "G",
       width: 400,
       height: 300,
       showToolBar: false,
       showAlgebraInput: false,
       showMenuBar: false,
       appletOnLoad: appletOnLoad,
-      filename: question?.options?.isAxesRatioFixed
-        ? "/geogebra-default-ortho.ggb"
-        : "/geogebra-default-app.ggb",
+      filename: "/geogebra-default-ortho.ggb",
       showFullscreenButton: true,
     };
     var applet = new window.GGBApplet(params, true);
@@ -172,10 +76,7 @@ export const QuestionDisplay = ({
       showMenuBar: false,
       customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2",
       appletOnLoad: appletOnLoadGgbAns,
-      filename:
-        question?.studentGgbOptions?.isAxesRatioFixed === false
-          ? "/geogebra-default-app.ggb"
-          : "/geogebra-default-ortho.ggb",
+      filename: "/geogebra-default-ortho.ggb",
       // filename: "/geogebra-default-app.ggb",
       showFullscreenButton: true,
     };
@@ -248,6 +149,16 @@ export const QuestionDisplay = ({
       })
       .catch((err) => console.log(err));
   };
+  const onTestXml = () => {
+    // const app = window[`questionAnswer${index}`];
+    // const xml = app.getXML();
+    // const newXML = xml.replace(
+    //   /<axis id="1" .*?\/>/g,
+    //   '<axis id="1" show="true" label="" unitLabel="" tickStyle="1" showNumbers="false"/>'
+    // );
+    // console.log(newXML);
+    // console.log(app.setXML(newXML));
+  };
 
   return (
     <div className="border-white  bg-gray-900 p-3 m-2">
@@ -292,12 +203,12 @@ export const QuestionDisplay = ({
           <InlineMath math={`${question.startStatement} ${exo.connector!} ?`} />
         </div>
       )}
-      {question.commands?.length && (
+      {question.ggbOptions?.commands?.length && (
         <>
           <div id={`ggb-question-${index}`}></div>
         </>
       )}
-      <p>Coords : {question.coords?.join(";")}</p>
+      <p>Coords : {question.ggbOptions?.coords?.join(";")}</p>
       <p>Réponse attendue : </p>
       {question.answer && (
         <AnswerDisplay
@@ -357,6 +268,7 @@ export const QuestionDisplay = ({
           <button className="ml-3 border" onClick={onCheckGGB}>
             Check GGBVea
           </button>
+          <button onClick={onTestXml}>TEst xml</button>
           {ggbVeaResult !== undefined && (
             <span>{ggbVeaResult ? "OK!" : "Non"}</span>
           )}

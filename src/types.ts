@@ -1,5 +1,4 @@
 import { KeyId } from "./keyIds";
-
 export type GeneratorOptions = {};
 
 export type Proposition = {
@@ -8,6 +7,30 @@ export type Proposition = {
   isRightAnswer: boolean;
   format: "tex" | "raw";
 };
+export type GeogebraAxisOptions = {
+  steps?: number;
+  hiddden?: boolean;
+  showNumbers?: boolean;
+  label?: string;
+  natural?: boolean;
+};
+
+export type GeogebraOptions = {
+  customToolBar?: string;
+  forbidShiftDragZoom?: boolean;
+  commands?: string[];
+  coords: number[];
+  is3D?: boolean;
+  gridDistance?: [number, number] | false;
+  hideGrid?: boolean;
+  hideAxes?: boolean;
+  isGridBold?: boolean;
+  isGridSimple?: boolean;
+  lockedAxesRatio?: number | false;
+  xAxis?: GeogebraAxisOptions;
+  yAxis?: GeogebraAxisOptions;
+};
+
 export interface Question<TIdentifiers = {}> {
   instruction: string;
   hint?: string;
@@ -17,39 +40,14 @@ export interface Question<TIdentifiers = {}> {
   answerFormat?: "tex" | "raw";
   ggbAnswer?: string[];
   keys?: KeyId[];
-  commands?: string[];
-  coords?: number[];
-  options?: {
-    gridDistance?: [number, number] | false;
-    hideGrid?: boolean;
-    hideAxes?: boolean;
-    isGridBold?: boolean;
-    isGridSimple?: boolean;
-    isAxesRatioFixed?: boolean;
-    isXAxesNatural?: boolean;
-    is3D?: boolean;
-  };
-  studentGgbOptions?: {
-    customToolBar?: string;
-    gridDistance?: [number, number];
-    hideGrid?: boolean;
-    hideAxes?: boolean;
-    isGridBold?: boolean;
-    isGridSimple?: boolean;
-    isAxesRatioFixed?: boolean;
-    isXAxesNatural?: boolean;
-    xAxisSteps?: number;
-    yAxisSteps?: number;
-    enableShiftDragZoom?: boolean;
-    coords?: number[];
-    initialCommands?: string[];
-    axisLabels?: string[];
-  };
+  ggbOptions?: GeogebraOptions;
+  studentGgbOptions?: GeogebraOptions;
   style?: {
     tableHasNoHeader?: boolean;
   };
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
+  propositions?: Proposition[];
 }
 
 export type QCMGenerator<TIdentifiers> = (
@@ -85,8 +83,8 @@ export interface Exercise<TIdentifiers = {}> {
   isAnswerValid?: VEA<TIdentifiers>;
   isGGBAnswerValid?: GGBVEA<TIdentifiers>;
   hasGeogebra?: boolean;
-  subject: "Mathématiques" | "Chimie" | "Physique";
   hasHintAndCorrection?: boolean;
+  subject: "Mathématiques" | "Chimie" | "Physique";
 }
 
 export type MathLevel =
