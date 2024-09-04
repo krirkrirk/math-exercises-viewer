@@ -378,7 +378,7 @@ export const QuestionDisplay = ({
       <div style={{ maxWidth: "350px" }}>
         <p>
           <span className="text-gray-500">Identifiers :</span>{" "}
-          {JSON.stringify(question.identifiers)}
+          {JSON.stringify(question.identifiers, null, 1)}
         </p>
 
         {question?.coords && (
