@@ -288,7 +288,9 @@ export const QuestionDisplay = ({
       )}
 
       {question.startStatement && (
-        <InlineMath math={`${question.startStatement} ${exo.connector!} ?`} />
+        <div className="pt-2">
+          <InlineMath math={`${question.startStatement} ${exo.connector!} ?`} />
+        </div>
       )}
       {question.commands?.length && (
         <>
@@ -306,7 +308,7 @@ export const QuestionDisplay = ({
       {question.ggbAnswer && (
         <GGBAnswerDisplay ggbAnswer={question.ggbAnswer} />
       )}
-      <div>
+      <div className="pt-2">
         <span>latex: {question.answer}</span>
         <button className="ml-3 border" onClick={onCopyLatex}>
           Copy

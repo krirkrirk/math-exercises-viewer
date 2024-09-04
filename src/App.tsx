@@ -124,14 +124,42 @@ function App() {
             <p>{exoCount} Générateurs</p>
             <div
               style={{
-                backgroundColor: "red",
-                width: "1rem",
-                height: "0.5rem",
+                backgroundColor: "white",
+                width: "2rem",
+                height: "1rem",
                 marginLeft: "2rem",
                 marginRight: "0.5rem",
+                padding: "3px",
               }}
-            ></div>
-            <p> : Premium</p>
+            >
+              <div
+                style={{
+                  backgroundColor: "#097969",
+                  width: "100%",
+                  height: "100%",
+                }}
+              ></div>
+            </div>
+            <p> : Hint & correction ✅</p>
+            <div
+              style={{
+                backgroundColor: "white",
+                width: "2rem",
+                height: "1rem",
+                marginLeft: "2rem",
+                marginRight: "0.5rem",
+                padding: "3px",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#D70040",
+                  width: "100%",
+                  height: "100%",
+                }}
+              ></div>
+            </div>
+            <p> : Premium 💰</p>
           </div>
           <div style={{ display: "flex", columnGap: "1rem" }}>
             <button onClick={(e) => setDisplayType("all")}>Tous</button>
@@ -197,7 +225,7 @@ function App() {
             Next Generator
           </button>
           <span className="flex p-3">
-            <p className="mr-3 text-2xl">
+            <p className="m-0 mr-3 text-2xl">
               {selectedExercise.sections.join(", ")} {">>"}
             </p>
             <MarkdownParser text={selectedExercise.label}></MarkdownParser>

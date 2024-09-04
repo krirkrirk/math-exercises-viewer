@@ -61,9 +61,16 @@ export const GeneratorsListBySection = ({
         >
           <div>
             <div>
-              <h5>{generatorData.section}</h5>
+              <h5
+                className="pl-4 border-e-4"
+                style={{
+                  borderBottom: "#D70040 solid",
+                }}
+              >
+                {generatorData.section}
+              </h5>
             </div>
-            <div style={{}}>
+            <div className="gap-y-1 flex flex-col">
               {generatorData.data.map((generator) => {
                 return (
                   <div
@@ -71,7 +78,7 @@ export const GeneratorsListBySection = ({
                     className="border-2 p-2"
                     style={{
                       backgroundColor: isGeneratorPremium(generator.id)
-                        ? "red"
+                        ? "#D70040"
                         : "",
                     }}
                   >

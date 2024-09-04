@@ -31,24 +31,21 @@ export const GeneratorsList = ({
     );
   }, [allExercises]);
   return (
-    <div>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       {generatorData.map((generator) => (
         <button
           key={generator.id}
-          className="border-2 p-3"
+          className="border-2 px-4 py-4"
           onClick={(e) => onSelect(generator.id)}
+          style={{
+            ...(generator.hasHintAndCorrection && {
+              color: "white",
+              backgroundColor: "#097969",
+            }),
+          }}
         >
-          <div>
-            <div style={{}}>
-              <div
-                key={generator.id}
-                style={{
-                  backgroundColor: generator.hasHintAndCorrection ? "red" : "",
-                }}
-              >
-                <MarkdownParser text={generator.label}></MarkdownParser>
-              </div>
-            </div>
+          <div key={generator.id}>
+            <MarkdownParser text={generator.label}></MarkdownParser>
           </div>
         </button>
       ))}

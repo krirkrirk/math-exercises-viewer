@@ -63,17 +63,24 @@ export const GeneratorsListByLevel = ({
         <div key={generatorData.level} className="border-2 p-3 w-80 flex-none">
           <div>
             <div>
-              <h5>{generatorData.level}</h5>
+              <h5
+                className="pl-4 border-e-4"
+                style={{
+                  borderBottom: "#D70040 solid",
+                }}
+              >
+                {generatorData.level}
+              </h5>
             </div>
-            <div style={{}}>
+            <div className="gap-y-1 flex flex-col">
               {generatorData.data.map((generator) => {
                 return (
                   <div
                     key={generator.id}
-                    className="border-2 p-2"
+                    className="border-2 px-4 py-2"
                     style={{
                       backgroundColor: isGeneratorPremium(generator.id)
-                        ? "red"
+                        ? "#D70040"
                         : "",
                     }}
                   >
