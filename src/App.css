@@ -1,3 +1,7 @@
 .markdown p {
-  display: inline !important;
+  margin: 0;
+}
+
+.markdown .math-display .katex-display {
+  margin-top: 0.5em;
 }

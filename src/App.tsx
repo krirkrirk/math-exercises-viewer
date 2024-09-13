@@ -109,7 +109,7 @@ function App() {
     onSelect(prevExoId);
   };
   return (
-    <div className="App" style={{ width: "90vw", padding: "20px 50px" }}>
+    <div className="App" style={{ width: "100vw", padding: "20px 50px" }}>
       <div style={{ display: "flex", columnGap: "1rem" }}>
         <button onClick={(e) => (window.location.href = "/mathlive")}>
           MathLive
