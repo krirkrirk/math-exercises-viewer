@@ -78,7 +78,7 @@ export const QuestionDisplay = ({
       showMenuBar: false,
       customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2",
       appletOnLoad: appletOnLoadGgbAns,
-      filename: question.ggbOptions?.lockedAxesRatio
+      filename: question.studentGgbOptions?.lockedAxesRatio
         ? "/geogebra-default-ortho.ggb"
         : "/geogebra-default-app.ggb",
       showFullscreenButton: true,
@@ -164,6 +164,33 @@ export const QuestionDisplay = ({
     // console.log(app.setXML(newXML));
   };
 
+  const onDisplayGGBAnswer = () => {
+    const app = window[`questionAnswer${index}`];
+    question.ggbAnswer?.forEach((command) => {
+      app.evalCommand(command);
+    });
+  };
+
+  const onGGBClean = () => {
+    const app = window[`questionAnswer${index}`];
+    app.getAllObjectNames().forEach((value: string) => {
+      app.deleteObject(value);
+    });
+  };
+
+  const onXMLConsole = () => {
+    const app = window[`question${index}`];
+    console.log(app.getXML());
+  };
+  const onEditXML = () => {
+    const app = window[`question${index}`];
+    const yDelta =
+      question.ggbOptions!.coords[3] - question.ggbOptions!.coords[2];
+    if (yDelta > 40) {
+      const xml = app.getXML().replace('distY="1"', "distY='10'");
+      app.setXML(xml);
+    }
+  };
   return (
     <div className="border-gray-800 border-solid border bg-gray-900 p-3 mt-2 grid grid-cols-3">
       <div className="pr-8 pl-2 py-1 mr-8 col-span-2 border-solid border-transparent border-r-2 border-r-gray-700">
@@ -222,7 +249,7 @@ export const QuestionDisplay = ({
           </div>
         )}
 
-        {question.commands?.length && (
+        {question.ggbOptions?.coords?.length && (
           <>
             <div id={`ggb-question-${index}`}></div>
           </>
@@ -296,11 +323,19 @@ export const QuestionDisplay = ({
           {JSON.stringify(question.identifiers, null, 1)}
         </p>
 
-        {question?.coords && (
-          <p>
-            <span className="text-gray-500">Coords :</span>{" "}
-            {question.coords?.join(";")}
-          </p>
+        {question?.ggbOptions?.coords?.length && (
+          <>
+            <p>
+              <span className="text-gray-500">Coords :</span>{" "}
+              {question.ggbOptions.coords.join(";")}
+            </p>
+            <button className="ml-3 border" onClick={onXMLConsole}>
+              Console XML
+            </button>
+            <button className="ml-3 border" onClick={onEditXML}>
+              Edit XML
+            </button>
+          </>
         )}
         <p className="text-gray-500 mb-1">Réponse attendue : </p>
         {question.answer && (
@@ -311,6 +346,16 @@ export const QuestionDisplay = ({
         )}
         {question.ggbAnswer && (
           <GGBAnswerDisplay ggbAnswer={question.ggbAnswer} />
+        )}
+        {question.ggbAnswer && (
+          <>
+            <button className="ml-3 border" onClick={onDisplayGGBAnswer}>
+              Afficher réponse
+            </button>
+            <button className="ml-3 border" onClick={onGGBClean}>
+              Clean GGB
+            </button>
+          </>
         )}
 
         <div className="mt-2">

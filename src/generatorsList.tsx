@@ -16,10 +16,8 @@ export const isGeneratorPremium = (generatorId: string) => {
 
 export const GeneratorsList = ({
   allExercises,
-  onSelect,
 }: {
   allExercises: Exercise[];
-  onSelect: (exoId: string) => void;
 }) => {
   const [generatorData, setGeneratorData] = useState<MLExercise[]>([]);
   useEffect(() => {
@@ -30,24 +28,26 @@ export const GeneratorsList = ({
       })
     );
   }, [allExercises]);
+
   return (
     <div style={{ display: "flex", flexWrap: "wrap" }}>
       {generatorData.map((generator) => (
-        <button
-          key={generator.id}
-          className="border-2 px-4 py-4"
-          onClick={(e) => onSelect(generator.id)}
-          style={{
-            ...(generator.hasHintAndCorrection && {
-              color: "white",
-              backgroundColor: "#097969",
-            }),
-          }}
-        >
-          <div key={generator.id}>
-            <MarkdownParser text={generator.label}></MarkdownParser>
-          </div>
-        </button>
+        <a key={generator.id} href={`/exo?exoId=${generator.id}`}>
+          <button
+            key={generator.id}
+            className="border-2 px-4 py-4"
+            style={{
+              ...(generator.hasHintAndCorrection && {
+                color: "white",
+                backgroundColor: "#097969",
+              }),
+            }}
+          >
+            <div key={generator.id}>
+              <MarkdownParser text={generator.label}></MarkdownParser>
+            </div>
+          </button>
+        </a>
       ))}
     </div>
   );

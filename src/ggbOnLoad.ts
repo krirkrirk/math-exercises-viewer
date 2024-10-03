@@ -58,6 +58,13 @@ export const ggbOnLoad = (app: any, ggbOptions: GeogebraOptions) => {
     app.setGraphicsOptions(1, {
       gridDistance: { x: gridDistance[0], y: gridDistance[1] },
     });
+    if (gridDistance[1] === 1) {
+      const yDelta = ggbOptions!.coords[3] - ggbOptions!.coords[2];
+      if (yDelta > 40) {
+        const xml = app.getXML().replace('distY="1"', "distY='10'");
+        app.setXML(xml);
+      }
+    }
   }
   const isGridBold = ggbOptions.isGridBold;
   if (isGridBold) {

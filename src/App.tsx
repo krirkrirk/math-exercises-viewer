@@ -7,6 +7,7 @@ import { QuestionDisplay } from "./questionDisplay";
 import { GeneratorsList } from "./generatorsList";
 import { GeneratorsListByLevel } from "./generatorsListByLevel";
 import { GeneratorsListBySection } from "./generatorsListBySection";
+import { SelectedExercisePage } from "./selectedExercisePage";
 
 function App() {
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
@@ -23,6 +24,37 @@ function App() {
   const [isQCM, setIsQCM] = useState(false);
   const [isGGB, setIsGGB] = useState(false);
 
+  const [showGeogebraExos, setShowGeogebraExos] = useState(
+    window.location.href.includes("showGGB=true")
+  );
+  const [showStudentGeogebraExos, setShowStudentGeogebraExos] = useState(
+    window.location.href.includes("showStudentGGB=true")
+  );
+  useEffect(() => {
+    if (showGeogebraExos) {
+      if (window.location.href.includes("showGGB"))
+        window.location.href.replace("showGGB=false", "showGGB=true");
+      else {
+        window.location.href += "?showGGB=true";
+      }
+    } else {
+      window.location.href.replace("?showGGB=true", "");
+    }
+  }, [showGeogebraExos]);
+  useEffect(() => {
+    if (showStudentGeogebraExos) {
+      if (window.location.href.includes("showStudentGGB"))
+        window.location.href.replace(
+          "showStudentGGB=false",
+          "showStudentGGB=true"
+        );
+      else {
+        window.location.href += "?showStudentGGB=true";
+      }
+    } else {
+      window.location.href.replace("?showStudentGGB=true", "");
+    }
+  }, [showStudentGeogebraExos]);
   useEffect(() => {
     const url = new URL(window.location.href);
     const exoId = url.searchParams.get("exoId");
@@ -32,6 +64,13 @@ function App() {
     setIsGGB(ggb === "true");
     const isMathlive = url.pathname.includes("mathlive");
     const isXplive = url.pathname.includes("xplive");
+    const showGeogebraExos = url.href.includes("showGGB=true");
+    const showStudentGGBExos = url.href.includes("showStudentGGB=true");
+    const exoFilter = (exo: Exercise) => {
+      if (showGeogebraExos && !exo.hasGeogebra) return false;
+      if (showStudentGGBExos && exo.answerType !== "GGB") return false;
+      return true;
+    };
     if (exoId) {
       if (ggb === "true") {
         fetch(`http://localhost:5000/exo?exoId=${exoId}`)
@@ -71,7 +110,7 @@ function App() {
         fetch("http://localhost:5000/mathlive")
           .then((res) => res.json())
           .then((res) => {
-            setAllExercises(res);
+            setAllExercises(res.filter(exoFilter));
             setExoCount(res.length);
           })
           .catch((err) => console.log(err));
@@ -79,7 +118,7 @@ function App() {
         fetch("http://localhost:5000/xplive")
           .then((res) => res.json())
           .then((res) => {
-            setAllExercises(res);
+            setAllExercises(res.filter(exoFilter));
             setExoCount(res.length);
           })
           .catch((err) => console.log(err));
@@ -87,7 +126,7 @@ function App() {
         fetch("http://localhost:5000")
           .then((res) => res.json())
           .then((res) => {
-            setAllExercises(res);
+            setAllExercises(res.filter(exoFilter));
             setExoCount(res.length);
           })
           .catch((err) => console.log(err));
@@ -117,6 +156,26 @@ function App() {
         <button onClick={(e) => (window.location.href = "/xplive")}>
           XpLive
         </button>
+        <div>
+          <input
+            type="checkbox"
+            id="ggb"
+            name="ggb"
+            checked={showGeogebraExos}
+            onChange={(e) => setShowGeogebraExos(e.target.checked)}
+          />
+          <label>Geogebra</label>
+        </div>
+        <div>
+          <input
+            type="checkbox"
+            id="studentGgb"
+            name="studentGgb"
+            checked={showStudentGeogebraExos}
+            onChange={(e) => setShowStudentGeogebraExos(e.target.checked)}
+          />
+          <label>Student Geogebra</label>
+        </div>
       </div>
       {!!allExercises.length && (
         <div>
@@ -169,7 +228,7 @@ function App() {
             </button>
           </div>
           {displayType === "all" && (
-            <GeneratorsList allExercises={allExercises} onSelect={onSelect} />
+            <GeneratorsList allExercises={allExercises} />
           )}
           {displayType === "byLevel" && (
             <GeneratorsListByLevel allExercises={allExercises} />
@@ -179,77 +238,16 @@ function App() {
           )}
         </div>
       )}
+
       {selectedExercise?.id && (
-        <div style={{ width: "100%" }}>
-          {!isGGB && (
-            <button
-              onClick={(e) =>
-                (window.location.href =
-                  window.location.href.replace("&isQCM=true", "") +
-                  "&isGGB=true")
-              }
-              className="border-2 p-3"
-            >
-              Version GGB
-            </button>
-          )}
-          {!isQCM && (
-            <button
-              onClick={(e) =>
-                (window.location.href =
-                  window.location.href.replace("&isGGB=true", "") +
-                  "&isQCM=true")
-              }
-              className="border-2 p-3"
-            >
-              Version QCM
-            </button>
-          )}
-          {(isQCM || isGGB) && (
-            <button
-              onClick={(e) =>
-                (window.location.href = window.location.href
-                  .replace("&isQCM=true", "")
-                  .replace("&isGGB=true", ""))
-              }
-              className="border-2 p-3"
-            >
-              Version Free
-            </button>
-          )}
-
-          <button onClick={(e) => onPrev()} className="border-2 p-3">
-            Prev Generator
-          </button>
-          <button onClick={(e) => onNext()} className="border-2 p-3">
-            Next Generator
-          </button>
-          <span className="flex p-3">
-            <p className="m-0 mr-3 text-2xl">
-              {selectedExercise.sections.join(", ")} {">>"}
-            </p>
-            <MarkdownParser text={selectedExercise.label}></MarkdownParser>
-          </span>
-          <p>Connecteur : {selectedExercise.connector}</p>
-
-          <p>Niveaux : {selectedExercise.levels.join(", ")}</p>
-          <p>
-            {selectedExercise.isSingleStep
-              ? "En une étape"
-              : "Plusieurs étapes"}
-          </p>
-
-          {questions.map((question, index) => (
-            <QuestionDisplay
-              exo={selectedExercise}
-              question={question}
-              key={index}
-              index={index}
-              isQCM={isQCM}
-              isGGB={isGGB}
-            />
-          ))}
-        </div>
+        <SelectedExercisePage
+          isGGB={isGGB}
+          isQCM={isQCM}
+          selectedExercise={selectedExercise}
+          onPrev={onPrev}
+          onNext={onNext}
+          questions={questions}
+        />
       )}
     </div>
   );
