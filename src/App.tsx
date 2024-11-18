@@ -58,6 +58,7 @@ function App() {
   useEffect(() => {
     const url = new URL(window.location.href);
     const exoId = url.searchParams.get("exoId");
+    const exoOptions = url.searchParams.get("options");
     const qcm = url.searchParams.get("isQCM");
     const ggb = url.searchParams.get("isGGB");
     setIsQCM(qcm === "true");
@@ -73,7 +74,7 @@ function App() {
     };
     if (exoId) {
       if (ggb === "true") {
-        fetch(`http://localhost:5000/exo?exoId=${exoId}`)
+        fetch(`http://localhost:5000/exo?exoId=${exoId}&options=${exoOptions}`)
           .then((res) => res.json())
           .then((res) => {
             setSelectedExercise(res.exercise);
@@ -84,7 +85,9 @@ function App() {
           })
           .catch((err) => console.log(err));
       } else if (qcm === "true") {
-        fetch(`http://localhost:5000/qcmExo?exoId=${exoId}`)
+        fetch(
+          `http://localhost:5000/qcmExo?exoId=${exoId}&options=${exoOptions}`
+        )
           .then((res) => res.json())
           .then((res) => {
             setSelectedExercise(res.exercise);
@@ -94,7 +97,7 @@ function App() {
           })
           .catch((err) => console.log(err));
       } else {
-        fetch(`http://localhost:5000/exo?exoId=${exoId}`)
+        fetch(`http://localhost:5000/exo?exoId=${exoId}&options=${exoOptions}`)
           .then((res) => res.json())
           .then((res) => {
             setSelectedExercise(res.exercise);

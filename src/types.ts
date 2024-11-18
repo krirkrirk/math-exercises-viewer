@@ -1,5 +1,10 @@
 import { KeyId } from "./keyIds";
-export type GeneratorOptions = {};
+
+export type GeneratorOptions = {
+  id: string;
+  label: string;
+  type: "checkbox" | "select";
+};
 
 export type Proposition = {
   id: string;
@@ -7,12 +12,14 @@ export type Proposition = {
   isRightAnswer: boolean;
   format: "tex" | "raw";
 };
+
 export type GeogebraAxisOptions = {
   steps?: number;
-  hiddden?: boolean;
-  showNumbers?: boolean;
+  hidden?: boolean;
+  hideNumbers?: boolean;
   label?: string;
   natural?: boolean;
+  showPositive?: boolean;
 };
 
 export type GeogebraOptions = {
@@ -31,7 +38,11 @@ export type GeogebraOptions = {
   yAxis?: GeogebraAxisOptions;
 };
 
-export interface Question<TIdentifiers = {}> {
+export type KeyboardOptions = {
+  parenthesisShouldNotProduceLeftRight?: boolean;
+};
+
+export interface Question<TIdentifiers = {}, TOptions = {}> {
   instruction: string;
   hint?: string;
   correction?: string;
@@ -39,7 +50,9 @@ export interface Question<TIdentifiers = {}> {
   answer?: string;
   answerFormat?: "tex" | "raw";
   ggbAnswer?: string[];
-  keys?: KeyId[];
+  keyboardOptions?: KeyboardOptions;
+  keys?: (KeyId | KeyProps)[];
+  // keys?: KeyId[];
   ggbOptions?: GeogebraOptions;
   studentGgbOptions?: GeogebraOptions;
   style?: {
@@ -47,44 +60,112 @@ export interface Question<TIdentifiers = {}> {
   };
   divisionFormat?: "fraction" | "obelus";
   identifiers: TIdentifiers;
-  propositions?: Proposition[];
+  options?: TOptions;
 }
 
-export type QCMGenerator<TIdentifiers> = (
+export type QCMGenerator<TIdentifiers, TOptions = {}> = (
   n: number,
-  args: { answer: string } & TIdentifiers
+  args: { answer: string } & TIdentifiers,
+  options?: TOptions
 ) => Proposition[];
-export type VEA<TIdentifiers> = (
+export type VEA<TIdentifiers, TOptions = {}> = (
   studentAnswer: string,
-  args: { answer: string } & TIdentifiers
+  args: { answer: string } & TIdentifiers,
+  options?: TOptions
 ) => boolean;
-export type GGBVEA<TIdentifiers> = (
+export type GGBVEA<TIdentifiers, TOptions = {}> = (
   studentAnswer: string[],
-  args: { ggbAnswer: string[] } & TIdentifiers
+  args: { ggbAnswer: string[] } & TIdentifiers,
+  options?: TOptions
 ) => boolean;
 export type QuestionGenerator<TIdentifiers = {}, TOptions = {}> = (
   opts?: TOptions
 ) => Question<TIdentifiers>;
-export interface Exercise<TIdentifiers = {}> {
+export type GetHint<TIdentifiers, TOptions = {}> = (
+  args: TIdentifiers,
+  options?: TOptions
+) => string;
+export type GetCorrection<TIdentifiers, TOptions = {}> = (
+  args: TIdentifiers,
+  options?: TOptions
+) => string;
+export type GetInstruction<TIdentifiers, TOptions = {}> = (
+  args: TIdentifiers,
+  options?: TOptions
+) => string;
+export type GetAnswer<TIdentifiers, TOptions = {}> = (
+  args: TIdentifiers,
+  options?: TOptions
+) => string;
+export type GetKeys<TIdentifiers, TOptions = {}> = (
+  args: TIdentifiers,
+  options?: TOptions
+) => (KeyId | KeyProps)[];
+export type GetGGBAnswer<TIdentifiers, TOptions = {}> = (
+  args: TIdentifiers,
+  options?: TOptions
+) => string[];
+export type GetGGBOptions<TIdentifiers, TOptions = {}> = (
+  args: TIdentifiers,
+  options?: TOptions
+) => GeogebraOptions;
+export type GetStudentGGBOptions<TIdentifiers, TOptions = {}> = (
+  args: TIdentifiers,
+  options?: TOptions
+) => GeogebraOptions;
+export type RebuildIdentifiers<TIdentifiers, TOptions = {}> = (
+  oldIdentifiers: any,
+  options?: TOptions
+) => TIdentifiers;
+export type GetQuestionFromIdentifiers<TIdentifiers, TOptions = {}> = (
+  identifiers: TIdentifiers,
+  options?: TOptions
+) => Question<TIdentifiers>;
+export type QuestionHotFix<TIdentifiers, TOptions = {}> = (
+  q: Question<TIdentifiers>,
+  options?: TOptions
+) => Question<TIdentifiers>;
+
+type PDFOptions = {
+  //on pourrait mettre ici des props pour geogebra
+  shouldSpreadPropositions?: boolean;
+};
+export interface Exercise<TIdentifiers = {}, TOptions = {}> {
   id: string;
   isSingleStep: boolean;
   label: string;
-  sections: (MathSection | PCSection)[];
-  levels: MathLevel[];
+  pdfOptions?: PDFOptions;
+  options?: GeneratorOptions[];
+  sections?: (MathSection | PCSection)[];
+  levels?: MathLevel[];
   connector?: "=" | "\\iff" | "\\approx";
   generator: (n: number) => Question<TIdentifiers>[];
   maxAllowedQuestions?: number;
   answerType?: "GGB" | "QCM" | "free" | "QCU";
   isQCM?: boolean;
-  qcmTimer: number;
-  freeTimer: number;
+  qcmTimer?: number;
+  freeTimer?: number;
   ggbTimer?: number;
-  getPropositions?: QCMGenerator<{ answer: string } & TIdentifiers>;
-  isAnswerValid?: VEA<TIdentifiers>;
-  isGGBAnswerValid?: GGBVEA<TIdentifiers>;
+  getPropositions?: QCMGenerator<{ answer: string } & TIdentifiers, TOptions>;
+  isAnswerValid?: VEA<TIdentifiers, TOptions>;
+  isGGBAnswerValid?: GGBVEA<TIdentifiers, TOptions>;
   hasGeogebra?: boolean;
-  hasHintAndCorrection?: boolean;
   subject: "Mathématiques" | "Chimie" | "Physique";
+  hasHintAndCorrection?: boolean;
+  getInstruction?: GetInstruction<TIdentifiers, TOptions>;
+  getHint?: GetHint<TIdentifiers, TOptions>;
+  getCorrection?: GetCorrection<TIdentifiers, TOptions>;
+  getKeys?: GetKeys<TIdentifiers, TOptions>;
+  getAnswer?: GetAnswer<TIdentifiers, TOptions>;
+  getGGBAnswer?: GetGGBAnswer<TIdentifiers, TOptions>;
+  getGGBOptions?: GetGGBOptions<TIdentifiers, TOptions>;
+  getStudentGGBOptions?: GetStudentGGBOptions<TIdentifiers, TOptions>;
+  rebuildIdentifiers?: RebuildIdentifiers<TIdentifiers, TOptions>;
+  getQuestionFromIdentifiers?: GetQuestionFromIdentifiers<
+    TIdentifiers,
+    TOptions
+  >;
+  hotFix?: QuestionHotFix<TIdentifiers, TOptions>;
 }
 
 export type MathLevel =

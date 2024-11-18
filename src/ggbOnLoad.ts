@@ -10,7 +10,6 @@ export const ggbOnLoad = (app: any, ggbOptions: GeogebraOptions) => {
   let newXML = "";
 
   if (ggbOptions.lockedAxesRatio !== 1) {
-    console.log(ggbOptions.lockedAxesRatio);
     willChangeXML = true;
     xml = app.getXML();
     if (ggbOptions.lockedAxesRatio) {
@@ -22,7 +21,30 @@ export const ggbOnLoad = (app: any, ggbOptions: GeogebraOptions) => {
       newXML = xml.replace(/lockedAxesRatio="1"/g, " ");
     }
     // newXML = xml.replace(/showNumbers="true"/g, 'showNumbers="false"');
-    console.log(newXML);
+    app.setXML(newXML);
+  }
+  if (ggbOptions.xAxis) {
+    xml = app.getXML();
+    let s = `<axis id="0" show="${
+      ggbOptions.xAxis.hidden ? "false" : "true"
+    }" label="" unitLabel="" tickStyle="1" showNumbers="${
+      ggbOptions.xAxis.hideNumbers ? "false" : "true"
+    }" ${
+      ggbOptions.xAxis.steps ? `tickDistance="${ggbOptions.xAxis.steps}"` : ""
+    } ${ggbOptions.xAxis.showPositive ? 'positiveAxis="true"' : ""}/>`;
+    newXML = xml.replace(/<axis id="0"[^>]*\/>/g, s);
+    app.setXML(newXML);
+  }
+  if (ggbOptions.yAxis) {
+    xml = app.getXML();
+    let s = `<axis id="1" show="${
+      ggbOptions.yAxis.hidden ? "false" : "true"
+    }" label="" unitLabel="" tickStyle="1" showNumbers="${
+      ggbOptions.yAxis.hideNumbers ? "false" : "true"
+    }" ${
+      ggbOptions.yAxis.steps ? `tickDistance="${ggbOptions.yAxis.steps}"` : ""
+    } ${ggbOptions.yAxis.showPositive ? 'positiveAxis="true"' : ""}/>`;
+    newXML = xml.replace(/<axis id="1"[^>]*\/>/g, s);
     app.setXML(newXML);
   }
 
@@ -78,6 +100,9 @@ export const ggbOnLoad = (app: any, ggbOptions: GeogebraOptions) => {
       gridType: 0,
     });
   }
+  const enableShiftDragZoom = !ggbOptions?.forbidShiftDragZoom;
+  app.enableShiftDragZoom(enableShiftDragZoom);
+
   const xAxisLabel = ggbOptions.xAxis?.label;
   const yAxisLabel = ggbOptions.yAxis?.label;
   if (xAxisLabel || yAxisLabel) {

@@ -17,7 +17,30 @@ export const ggbStudentAnswerOnLoad = (
   if (ggbOptions?.hideGrid) {
     app.evalCommand("ShowGrid(false)");
   }
-
+  if (ggbOptions.xAxis) {
+    const xml = app.getXML();
+    let s = `<axis id="0" show="${
+      ggbOptions.xAxis.hidden ? "false" : "true"
+    }" label="" unitLabel="" tickStyle="1" showNumbers="${
+      ggbOptions.xAxis.hideNumbers ? "false" : "true"
+    }" ${
+      ggbOptions.xAxis.steps ? `tickDistance="${ggbOptions.xAxis.steps}"` : ""
+    } ${ggbOptions.xAxis.showPositive ? 'positiveAxis="true"' : ""}/>`;
+    const newXML = xml.replace(/<axis id="0"[^>]*\/>/g, s);
+    app.setXML(newXML);
+  }
+  if (ggbOptions.yAxis) {
+    const xml = app.getXML();
+    let s = `<axis id="1" show="${
+      ggbOptions.yAxis.hidden ? "false" : "true"
+    }" label="" unitLabel="" tickStyle="1" showNumbers="${
+      ggbOptions.yAxis.hideNumbers ? "false" : "true"
+    }" ${
+      ggbOptions.yAxis.steps ? `tickDistance="${ggbOptions.yAxis.steps}"` : ""
+    } ${ggbOptions.yAxis.showPositive ? 'positiveAxis="true"' : ""}/>`;
+    const newXML = xml.replace(/<axis id="1"[^>]*\/>/g, s);
+    app.setXML(newXML);
+  }
   const gridDistance = ggbOptions?.gridDistance;
   if (gridDistance) {
     app.setGraphicsOptions(1, {
@@ -36,7 +59,7 @@ export const ggbStudentAnswerOnLoad = (
       gridType: 0,
     });
   }
-
+  console.log(ggbOptions);
   const enableShiftDragZoom = !ggbOptions?.forbidShiftDragZoom;
   app.enableShiftDragZoom(enableShiftDragZoom);
 

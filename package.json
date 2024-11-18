@@ -18,9 +18,11 @@
     "react-dom": "^18.2.0",
     "react-katex": "^3.0.1",
     "react-markdown": "^8.0.7",
-    "react-math-keyboard": "^1.5.23",
+    "react-math-keyboard": "^1.5.27",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-katex": "^6.0.2",
+    "remark-comment-config": "^8.0.0",
+    "remark-comments": "^1.2.10",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1"
   },

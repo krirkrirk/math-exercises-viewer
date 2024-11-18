@@ -8,11 +8,9 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 //@ts-ignore
 import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
-
 type Props = {
   text: string;
 };
-
 export default function MarkdownParser({ text }: Props) {
   return (
     <ReactMarkdown
@@ -48,7 +46,8 @@ export default function MarkdownParser({ text }: Props) {
         },
       }}
     >
-      {text}
+      {/* destroys comments */}
+      {text.replaceAll(/\n<!--.*/g, "")}
     </ReactMarkdown>
   );
 }

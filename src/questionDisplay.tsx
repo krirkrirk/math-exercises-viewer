@@ -17,6 +17,11 @@ type Props = {
   isGGB: boolean;
 };
 
+export const formatLatexBeforeResultSend = (s: string) => {
+  //removes ^{ } (si puissance puis suppression, la puissance reste)
+  return s.replace(/\^\{\s\}/g, "");
+};
+
 export const QuestionDisplay = ({
   exo,
   question,
@@ -40,7 +45,6 @@ export const QuestionDisplay = ({
     // );
     // console.log(newXML);
     // console.log(app.setXML(newXML));
-    console.log(question.studentGgbOptions);
     ggbStudentAnswerOnLoad(app, question.studentGgbOptions!);
   };
 
@@ -60,6 +64,7 @@ export const QuestionDisplay = ({
         ? "/geogebra-default-ortho.ggb"
         : "/geogebra-default-app.ggb",
       showFullscreenButton: true,
+      enableShiftDragZoom: !question.studentGgbOptions?.forbidShiftDragZoom,
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
@@ -82,6 +87,7 @@ export const QuestionDisplay = ({
         ? "/geogebra-default-ortho.ggb"
         : "/geogebra-default-app.ggb",
       showFullscreenButton: true,
+      enableShiftDragZoom: !question.studentGgbOptions?.forbidShiftDragZoom,
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-answer-${index}`);
@@ -98,20 +104,21 @@ export const QuestionDisplay = ({
   }, [latex]);
 
   const vea = (input: string) => {
-    fetch(`http://localhost:5000/vea?exoId=${exo.id}`, {
+    const url = new URL(window.location.href);
+    const optionsParam = url.searchParams.get("options");
+    fetch(`http://localhost:5000/vea?exoId=${exo.id}&options=${optionsParam}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
       body: JSON.stringify({
-        ans: input,
+        ans: formatLatexBeforeResultSend(input),
         veaProps: { answer: question.answer, ...question.identifiers },
       }),
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setVeaResult(res.result);
       })
       .catch((err) => console.log(err));
@@ -123,9 +130,7 @@ export const QuestionDisplay = ({
     mathfieldRef.current.latex(question.answer);
   };
 
-  const onCheckGGB = () => {
-    //TODO Récupérer les objets crées par l'élève et vérifier si c'est ce qui est attendu
-
+  const getStudentGGBCommands = () => {
     const app = window[`questionAnswer${index}`];
     const commandsObj = app.getAllObjectNames().map((value: string) => {
       const objType = app.getObjectType(value);
@@ -133,6 +138,10 @@ export const QuestionDisplay = ({
         ? `${value}=(${app.getXcoord(value)},${app.getYcoord(value)})`
         : `${value}=${app.getCommandString(value, false)}`;
     });
+    return commandsObj;
+  };
+  const onCheckGGB = () => {
+    const commandsObj = getStudentGGBCommands();
 
     fetch(`http://localhost:5000/ggbvea?exoId=${exo.id}`, {
       method: "POST",
@@ -147,21 +156,9 @@ export const QuestionDisplay = ({
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setGgbVeaResult(res.result);
       })
       .catch((err) => console.log(err));
-  };
-  const getXML = () => {
-    const app = window[`question${index}`];
-    const xml = app.getXML();
-    // const newXML = xml.replace(
-    //   /<axis id="1" .*?\/>/g,
-    //   '<axis id="1" show="true" label="" unitLabel="" tickStyle="1" showNumbers="false"/>'
-    // );
-    console.log(xml);
-    console.log(question.ggbOptions);
-    // console.log(app.setXML(newXML));
   };
 
   const onDisplayGGBAnswer = () => {
@@ -190,6 +187,12 @@ export const QuestionDisplay = ({
       const xml = app.getXML().replace('distY="1"', "distY='10'");
       app.setXML(xml);
     }
+  };
+
+  const [studentGGBCommmands, setStudentGGBCommmands] = useState<string[]>([]);
+  const onDisplayStudentGGBCommands = () => {
+    const commands = getStudentGGBCommands();
+    setStudentGGBCommmands(commands);
   };
   return (
     <div className="border-gray-800 border-solid border bg-gray-900 p-3 mt-2 grid grid-cols-3">
@@ -263,6 +266,7 @@ export const QuestionDisplay = ({
               setValue={setLatex}
               setMathfieldRef={(mf: any) => (mathfieldRef.current = mf)}
               forbidOtherKeyboardKeys={true}
+              {...question.keyboardOptions}
             />
             <div className="flex justify-between gap-x-3">
               <p className="mt-1 mb-0">
@@ -355,6 +359,21 @@ export const QuestionDisplay = ({
             <button className="ml-3 border" onClick={onGGBClean}>
               Clean GGB
             </button>
+          </>
+        )}
+        {!!question.studentGgbOptions && (
+          <>
+            <button
+              className="ml-3 border"
+              onClick={onDisplayStudentGGBCommands}
+            >
+              Afficher student commands
+            </button>
+            <p>
+              {studentGGBCommmands.map((c, index) => (
+                <div key={index}>{c}</div>
+              ))}
+            </p>
           </>
         )}
 
