@@ -44,7 +44,7 @@ export const GeneratorsList = ({
             }}
           >
             <div key={generator.id}>
-              <MarkdownParser text={generator.label}></MarkdownParser>
+              <MarkdownParser text={generator.id}></MarkdownParser>
             </div>
           </button>
         </a>

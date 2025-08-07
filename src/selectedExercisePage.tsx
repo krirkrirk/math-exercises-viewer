@@ -11,6 +11,7 @@ type Props = {
   onPrev: () => void;
   onNext: () => void;
   questions: Question[];
+  setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
 };
 export const SelectedExercisePage = ({
   isGGB,
@@ -19,6 +20,7 @@ export const SelectedExercisePage = ({
   onPrev,
   onNext,
   questions,
+  setQuestions,
 }: Props) => {
   const [options, setOptions] = useState<any>({});
   useEffect(() => {
@@ -33,7 +35,21 @@ export const SelectedExercisePage = ({
     console.log(url.pathname, url.href);
     window.location.href = url.href;
   };
-
+  const onReloadQuestion = (index: number) => {
+    fetch(
+      `http://localhost:5000/question?exoId=${
+        selectedExercise.id
+      }&options=${JSON.stringify(options)}`
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setQuestions((prev) =>
+          prev.map((q, i) => (i === index ? res.question : q))
+        );
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <div style={{ width: "100%" }}>
       {!isGGB && (
@@ -108,6 +124,7 @@ export const SelectedExercisePage = ({
           index={index}
           isQCM={isQCM}
           isGGB={isGGB}
+          onReload={() => onReloadQuestion(index)}
         />
       ))}
     </div>

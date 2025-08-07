@@ -6,6 +6,16 @@ export const ggbStudentAnswerOnLoad = (
 ) => {
   if (!ggbOptions?.coords?.length) return;
 
+  if (ggbOptions.fontSize) {
+    const xml = app.getXML();
+    const newXML = xml.replace(
+      /<font {2}size="24"/g,
+      `<font  size="${ggbOptions.fontSize}"`
+    );
+
+    app.setXML(newXML);
+  }
+
   if (ggbOptions?.commands) {
     ggbOptions.commands.forEach((command) => app.evalCommand(command));
   }
@@ -59,7 +69,7 @@ export const ggbStudentAnswerOnLoad = (
       gridType: 0,
     });
   }
-  console.log(ggbOptions);
+  // console.log(ggbOptions);
   const enableShiftDragZoom = !ggbOptions?.forbidShiftDragZoom;
   app.enableShiftDragZoom(enableShiftDragZoom);
 

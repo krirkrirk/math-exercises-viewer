@@ -1,111 +1,121 @@
-import { GeogebraOptions, Question } from "./types";
+import { GeogebraAxisOptions, GeogebraOptions, Question } from "./types";
 
 export const ggbOnLoad = (app: any, ggbOptions: GeogebraOptions) => {
-  if (!ggbOptions.commands?.length) return;
-  ggbOptions.commands.forEach((command) => app.evalCommand(command));
-  if (!ggbOptions.coords?.length) return;
+  if (!app) return;
+  // if (ggbOptions?.is3D) app.setPerspective("T");
+  // else app.setPerspective("G");
+  if (!ggbOptions?.commands && !ggbOptions?.coords) return;
 
-  let willChangeXML = false;
-  let xml = "";
-  let newXML = "";
+  app.getAllObjectNames().forEach((name: string) => app.deleteObject(name));
 
-  if (ggbOptions.lockedAxesRatio !== 1) {
-    willChangeXML = true;
-    xml = app.getXML();
-    if (ggbOptions.lockedAxesRatio) {
-      newXML = xml.replace(
-        /lockedAxesRatio="1"/g,
-        `lockedAxesRatio="${ggbOptions.lockedAxesRatio}"`
-      );
-    } else {
-      newXML = xml.replace(/lockedAxesRatio="1"/g, " ");
-    }
-    // newXML = xml.replace(/showNumbers="true"/g, 'showNumbers="false"');
-    app.setXML(newXML);
-  }
-  if (ggbOptions.xAxis) {
-    xml = app.getXML();
-    let s = `<axis id="0" show="${
-      ggbOptions.xAxis.hidden ? "false" : "true"
-    }" label="" unitLabel="" tickStyle="1" showNumbers="${
-      ggbOptions.xAxis.hideNumbers ? "false" : "true"
-    }" ${
-      ggbOptions.xAxis.steps ? `tickDistance="${ggbOptions.xAxis.steps}"` : ""
-    } ${ggbOptions.xAxis.showPositive ? 'positiveAxis="true"' : ""}/>`;
-    newXML = xml.replace(/<axis id="0"[^>]*\/>/g, s);
-    app.setXML(newXML);
-  }
-  if (ggbOptions.yAxis) {
-    xml = app.getXML();
-    let s = `<axis id="1" show="${
-      ggbOptions.yAxis.hidden ? "false" : "true"
-    }" label="" unitLabel="" tickStyle="1" showNumbers="${
-      ggbOptions.yAxis.hideNumbers ? "false" : "true"
-    }" ${
-      ggbOptions.yAxis.steps ? `tickDistance="${ggbOptions.yAxis.steps}"` : ""
-    } ${ggbOptions.yAxis.showPositive ? 'positiveAxis="true"' : ""}/>`;
-    newXML = xml.replace(/<axis id="1"[^>]*\/>/g, s);
-    app.setXML(newXML);
-  }
+  ggbOptions?.commands?.forEach((command) => app.evalCommand(command));
 
-  if (ggbOptions.is3D) {
-    // Gestion des coordonnées en 3D
-    app.setCoordSystem(
-      ggbOptions.coords[0],
-      ggbOptions.coords[1],
-      ggbOptions.coords[2],
-      ggbOptions.coords[3],
-      ggbOptions.coords[4],
-      ggbOptions.coords[5]
-    );
-  } else {
-    // Gestion des coordonnées en 2D
-    app.setCoordSystem(
-      ggbOptions.coords[0],
-      ggbOptions.coords[1],
-      ggbOptions.coords[2],
-      ggbOptions.coords[3]
-    );
-  }
-
-  if (ggbOptions.hideAxes) {
+  if (ggbOptions?.hideAxes) {
     app.evalCommand("ShowAxes(false)");
+  } else {
+    app.evalCommand("ShowAxes(true)");
   }
-  if (ggbOptions.hideGrid) {
-    app.evalCommand("ShowGrid(false)");
+
+  app.setGridVisible(!ggbOptions.hideGrid);
+
+  if (ggbOptions.fontSize) {
+    const xml = app.getXML();
+    const newXML = xml.replace(
+      /<font {2}size="24"/g,
+      `<font  size="${ggbOptions.fontSize}"`
+    );
+
+    app.setXML(newXML);
   }
+  if (
+    ggbOptions.lockedAxesRatio !== 1 &&
+    ggbOptions.lockedAxesRatio !== false
+  ) {
+    const xml = app.getXML();
+
+    const newXML = xml.replace(
+      /lockedAxesRatio="1"/g,
+      `lockedAxesRatio="${ggbOptions.lockedAxesRatio}"`
+    );
+
+    app.setXML(newXML);
+  }
+
+  const handleAxis = (
+    xml: string,
+    axisOptions: GeogebraAxisOptions,
+    axisName: string
+  ) => {
+    const axisId = axisName === "x" ? 0 : axisName === "y" ? 1 : 2;
+    const label = axisOptions.label
+      ? axisOptions.label
+      : ggbOptions?.is3D
+      ? axisName
+      : "";
+    const s = `<axis id="${axisId}" show="${
+      axisOptions.hidden ? "false" : "true"
+    }" label="${label}" unitLabel="" tickStyle="1" showNumbers="${
+      axisOptions.hideNumbers ? "false" : "true"
+    }" ${axisOptions.steps ? `tickDistance="${axisOptions.steps}"` : ""} ${
+      axisOptions.showPositive ? 'positiveAxis="true"' : ""
+    }/>`;
+    const regex = new RegExp(`<axis id="${axisId}"[^>]*\/>`, "g");
+    return xml.replace(regex, s);
+  };
+  if (ggbOptions.xAxis || ggbOptions.yAxis || ggbOptions.zAxis) {
+    const xml = app.getXML();
+    let newXML = ggbOptions.xAxis
+      ? handleAxis(xml, ggbOptions.xAxis, "x")
+      : xml;
+    newXML = ggbOptions.yAxis
+      ? handleAxis(newXML, ggbOptions.yAxis, "y")
+      : newXML;
+    newXML = ggbOptions.zAxis
+      ? handleAxis(newXML, ggbOptions.zAxis, "z")
+      : newXML;
+    app.setXML(newXML);
+  }
+
+  app.setCoordSystem(...ggbOptions.coords);
 
   const gridDistance = ggbOptions.gridDistance;
-  if (gridDistance) {
+  if (gridDistance && !ggbOptions.is3D) {
     app.setGraphicsOptions(1, {
       gridDistance: { x: gridDistance[0], y: gridDistance[1] },
     });
     if (gridDistance[1] === 1) {
       const yDelta = ggbOptions!.coords[3] - ggbOptions!.coords[2];
       if (yDelta > 40) {
-        const xml = app.getXML().replace('distY="1"', "distY='10'");
+        const xml = app.getXML().replace('distY="1"', 'distY="10"');
         app.setXML(xml);
       }
     }
   }
-  const isGridBold = ggbOptions.isGridBold;
+
+  const isGridBold = ggbOptions?.isGridBold;
   if (isGridBold) {
     app.setGraphicsOptions(1, {
       gridIsBold: false,
     });
   }
-  const isGridSimple = ggbOptions.isGridSimple;
+  const isGridSimple = ggbOptions?.isGridSimple;
   if (isGridSimple) {
     app.setGraphicsOptions(1, {
       gridType: 0,
     });
   }
-  const enableShiftDragZoom = !ggbOptions?.forbidShiftDragZoom;
+  // const xAxisLabel = ggbOptions.xAxis?.label;
+  // const yAxisLabel = ggbOptions.yAxis?.label;
+  // if (xAxisLabel || yAxisLabel) {
+  //   app.setAxisLabels(1, xAxisLabel ?? "", yAxisLabel ?? "");
+  // }
+
+  const enableShiftDragZoom = !ggbOptions.forbidShiftDragZoom;
   app.enableShiftDragZoom(enableShiftDragZoom);
 
-  const xAxisLabel = ggbOptions.xAxis?.label;
-  const yAxisLabel = ggbOptions.yAxis?.label;
-  if (xAxisLabel || yAxisLabel) {
-    app.setAxisLabels(1, xAxisLabel ?? "", yAxisLabel ?? "");
+  if (ggbOptions.viewDirectionVector) {
+    app.evalCommand(
+      `SetViewDirection(Vector((${ggbOptions.viewDirectionVector.join(",")})))`
+    );
   }
 };

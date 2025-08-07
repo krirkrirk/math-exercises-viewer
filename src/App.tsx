@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { Exercise, Question } from "./types";
-import MathInput from "react-math-keyboard";
-import MarkdownParser from "./markdownParser";
-import { QuestionDisplay } from "./questionDisplay";
 import { GeneratorsList } from "./generatorsList";
 import { GeneratorsListByLevel } from "./generatorsListByLevel";
 import { GeneratorsListBySection } from "./generatorsListBySection";
@@ -110,7 +107,7 @@ function App() {
       }
     } else {
       if (isMathlive) {
-        fetch("http://localhost:5000/mathlive")
+        fetch(`http://localhost:5000/mathlive`)
           .then((res) => res.json())
           .then((res) => {
             setAllExercises(res.filter(exoFilter));
@@ -118,7 +115,7 @@ function App() {
           })
           .catch((err) => console.log(err));
       } else if (isXplive) {
-        fetch("http://localhost:5000/xplive")
+        fetch(`http://localhost:5000/xplive`)
           .then((res) => res.json())
           .then((res) => {
             setAllExercises(res.filter(exoFilter));
@@ -126,7 +123,7 @@ function App() {
           })
           .catch((err) => console.log(err));
       } else {
-        fetch("http://localhost:5000")
+        fetch(`http://localhost:5000`)
           .then((res) => res.json())
           .then((res) => {
             setAllExercises(res.filter(exoFilter));
@@ -250,6 +247,7 @@ function App() {
           onPrev={onPrev}
           onNext={onNext}
           questions={questions}
+          setQuestions={setQuestions}
         />
       )}
     </div>

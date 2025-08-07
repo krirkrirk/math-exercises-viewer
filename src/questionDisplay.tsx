@@ -8,6 +8,8 @@ import { InlineMath, BlockMath } from "react-katex";
 import { GGBAnswerDisplay } from "./ggbAnswerDisplay";
 import { ggbOnLoad } from "./ggbOnLoad";
 import { ggbStudentAnswerOnLoad } from "./ggbStudentAnswerOnLoad";
+import { TableAnswerDisplay } from "./tableAnswerDisplay";
+import { TableAnswerInput } from "./tableAnswerInput";
 
 type Props = {
   exo: Exercise;
@@ -15,6 +17,7 @@ type Props = {
   index: number;
   isQCM: boolean;
   isGGB: boolean;
+  onReload: () => void;
 };
 
 export const formatLatexBeforeResultSend = (s: string) => {
@@ -28,17 +31,20 @@ export const QuestionDisplay = ({
   index,
   isQCM,
   isGGB,
+  onReload,
 }: Props) => {
   const [showHint, setShowHint] = useState(false);
   const [showCorrection, setShowCorrection] = useState(false);
 
+  // console.log(question);
   const appletOnLoad = (app: any) => {
     ggbOnLoad(app, question.ggbOptions!);
   };
-
+  const appletCorrOnLoad = (app: any) => {
+    ggbOnLoad(app, question.correctionGgbOptions!);
+  };
   const appletOnLoadGgbAns = (app: any) => {
     // const xml = app.getXML();
-
     // const newXML = xml.replace(
     //   /<axis id="1" .*?\/>/g,
     //   '<axis id="1" show="true" label="" unitLabel="" tickStyle="2" showNumbers="false"/>'
@@ -49,26 +55,54 @@ export const QuestionDisplay = ({
   };
 
   useEffect(() => {
-    if (!question || index === undefined) return;
+    if (!question || index === undefined || !showCorrection) return;
     var params = {
-      id: `question${index}`,
-      appName: "classic",
-      perspective: question.ggbOptions?.is3D ? "T" : "G",
-      width: 400,
-      height: 300,
+      id: `questioncorr${index}`,
+      appName: question.correctionGgbOptions?.is3D ? "3d" : "classic",
+      perspective: question.correctionGgbOptions?.is3D ? "T" : "G",
+      width: question.correctionGgbOptions?.maxWidth ?? 350,
+      height: question.correctionGgbOptions?.maxHeight ?? 200,
       showToolBar: false,
       showAlgebraInput: false,
       showMenuBar: false,
-      appletOnLoad: appletOnLoad,
-      filename: question.ggbOptions?.lockedAxesRatio
+      showToolBarHelp: false,
+      appletOnLoad: appletCorrOnLoad,
+      filename: question.correctionGgbOptions?.is3D
+        ? "/geogebra-default-3D.ggb"
+        : question.correctionGgbOptions?.lockedAxesRatio
         ? "/geogebra-default-ortho.ggb"
         : "/geogebra-default-app.ggb",
-      showFullscreenButton: true,
-      enableShiftDragZoom: !question.studentGgbOptions?.forbidShiftDragZoom,
+      showFullscreenButton: false,
+      enableShiftDragZoom: !question.correctionGgbOptions?.forbidShiftDragZoom,
+    };
+    var applet = new window.GGBApplet(params, true);
+    applet.inject(`ggb-question-correction-${index}`);
+  }, [index, question, showCorrection]);
+
+  useEffect(() => {
+    if (!question || index === undefined) return;
+    var params = {
+      id: `question${index}`,
+      appName: question.ggbOptions?.is3D ? "3d" : "classic",
+      perspective: question.ggbOptions?.is3D ? "T" : "G",
+      width: question.ggbOptions?.maxWidth ?? 350,
+      height: question.ggbOptions?.maxHeight ?? 200,
+      showToolBar: false,
+      showAlgebraInput: false,
+      showMenuBar: false,
+      showToolBarHelp: false,
+      appletOnLoad: appletOnLoad,
+      filename: question.ggbOptions?.is3D
+        ? "/geogebra-default-3D.ggb"
+        : question.ggbOptions?.lockedAxesRatio
+        ? "/geogebra-default-ortho.ggb"
+        : "/geogebra-default-app.ggb",
+      showFullscreenButton: false,
+      enableShiftDragZoom: !question.ggbOptions?.forbidShiftDragZoom,
     };
     var applet = new window.GGBApplet(params, true);
     applet.inject(`ggb-question-${index}`);
-  }, [index, question, isGGB]);
+  }, [index, question]);
 
   useEffect(() => {
     if (!isGGB) return;
@@ -76,11 +110,12 @@ export const QuestionDisplay = ({
       id: `questionAnswer${index}`,
       appName: "classic",
       perspective: "G",
-      width: 400,
-      height: 300,
+      width: question.studentGgbOptions?.maxWidth ?? 350,
+      height: question.studentGgbOptions?.maxHeight ?? 200,
       showToolBar: true,
       showAlgebraInput: true,
       showMenuBar: false,
+      showToolBarHelp: false,
       customToolBar: question.studentGgbOptions?.customToolBar ?? "0||1||2",
       appletOnLoad: appletOnLoadGgbAns,
       filename: question.studentGgbOptions?.lockedAxesRatio
@@ -94,7 +129,15 @@ export const QuestionDisplay = ({
   }, [index, question, isGGB]);
 
   const [latex, setLatex] = useState("");
+  const [tableInput, setTableInput] = useState<string[][]>(
+    question.initTable ?? []
+  );
+  useEffect(() => {
+    if (question.initTable) setTableInput(question.initTable);
+  }, [question.initTable]);
   const [veaResult, setVeaResult] = useState<boolean>();
+  const [tableVeaResult, setTableVeaResult] = useState<boolean>();
+
   const [hint, setHint] = useState("");
   const [correction, setCorrection] = useState("");
   const [ggbVeaResult, setGgbVeaResult] = useState<boolean>();
@@ -124,10 +167,41 @@ export const QuestionDisplay = ({
       .catch((err) => console.log(err));
   };
 
+  const tableVea = (input: string[][]) => {
+    console.log(input);
+    const url = new URL(window.location.href);
+    const optionsParam = url.searchParams.get("options");
+    fetch(
+      `http://localhost:5000/tableVea?exoId=${exo.id}&options=${optionsParam}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          ans: input,
+          veaProps: {
+            answerTable: question.answerTable,
+            ...question.identifiers,
+          },
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        setTableVeaResult(res.result);
+      })
+      .catch((err) => console.log(err));
+  };
+
   const mathfieldRef = useRef<any>();
   const onCopyLatex = () => {
-    console.log(mathfieldRef.current);
-    mathfieldRef.current.latex(question.answer);
+    if (question.initTable) {
+      setTableInput(question.answerTable!);
+    } else {
+      mathfieldRef.current.latex(question.answer);
+    }
   };
 
   const getStudentGGBCommands = () => {
@@ -194,6 +268,7 @@ export const QuestionDisplay = ({
     const commands = getStudentGGBCommands();
     setStudentGGBCommmands(commands);
   };
+
   return (
     <div className="border-gray-800 border-solid border bg-gray-900 p-3 mt-2 grid grid-cols-3">
       <div className="pr-8 pl-2 py-1 mr-8 col-span-2 border-solid border-transparent border-r-2 border-r-gray-700">
@@ -240,12 +315,21 @@ export const QuestionDisplay = ({
             <div className="grid grid-cols-2 gap-x-8">
               <div>
                 {showHint && (
-                  <MarkdownParser text={question.hint}></MarkdownParser>
+                  <MarkdownParser text={question.hint ?? ""}></MarkdownParser>
                 )}
               </div>
               <div>
                 {showCorrection && (
-                  <MarkdownParser text={question.correction}></MarkdownParser>
+                  <>
+                    <MarkdownParser
+                      text={question.correction ?? ""}
+                    ></MarkdownParser>
+                    {question.correctionGgbOptions?.coords?.length && (
+                      <>
+                        <div id={`ggb-question-correction-${index}`}></div>
+                      </>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -258,7 +342,7 @@ export const QuestionDisplay = ({
           </>
         )}
 
-        {!isQCM && !isGGB && (
+        {!isQCM && !isGGB && !question.answerTable && (
           <>
             <p className="mb-1 text-gray-500">Clavier : </p>{" "}
             <MathInput
@@ -288,6 +372,24 @@ export const QuestionDisplay = ({
               <span className="text-gray-500">latex : </span>
               {latex}
             </p>
+          </>
+        )}
+        {!!question.initTable && (
+          <>
+            <TableAnswerInput question={question} setTable={setTableInput} />
+            <div className="flex justify-between gap-x-3">
+              <div className=" mt-1">
+                <button
+                  onClick={() => tableVea(tableInput)}
+                  className="border "
+                >
+                  check vea
+                </button>
+                {tableVeaResult !== undefined && (
+                  <span className="ml-1">{tableVeaResult ? "✅" : "❌"}</span>
+                )}
+              </div>
+            </div>
           </>
         )}
         {isGGB && (
@@ -322,6 +424,7 @@ export const QuestionDisplay = ({
         )}
       </div>
       <div style={{ maxWidth: "350px" }}>
+        <button onClick={onReload}>Reload</button>
         <p>
           <span className="text-gray-500">Identifiers :</span>{" "}
           {JSON.stringify(question.identifiers, null, 1)}
@@ -342,11 +445,24 @@ export const QuestionDisplay = ({
           </>
         )}
         <p className="text-gray-500 mb-1">Réponse attendue : </p>
-        {question.answer && (
+        {!!question.answer && (
           <AnswerDisplay
             answer={question.answer}
             answerFormat={question.answerFormat ?? "tex"}
           />
+        )}
+        {question.propositions
+          ?.filter((p) => p.isRightAnswer)
+          .map((p) => (
+            <div id={p.id}>
+              <AnswerDisplay
+                answer={p.statement}
+                answerFormat={p.format ?? "tex"}
+              />
+            </div>
+          ))}
+        {!!question.answerTable && (
+          <TableAnswerDisplay answerTable={question.answerTable} />
         )}
         {question.ggbAnswer && (
           <GGBAnswerDisplay ggbAnswer={question.ggbAnswer} />
