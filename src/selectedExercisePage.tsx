@@ -107,14 +107,16 @@ export const SelectedExercisePage = ({
       </p>
 
       <p>Options : </p>
-      {selectedExercise.options?.map((opt) => (
-        <OptionDisplay
-          option={opt}
-          key={opt.id}
-          setOptions={setOptions}
-          options={options}
-        />
-      ))}
+      <div style={{ display: "flex", columnGap: 20 }}>
+        {selectedExercise.options?.map((opt) => (
+          <OptionDisplay
+            option={opt}
+            key={opt.id}
+            setOptions={setOptions}
+            options={options}
+          />
+        ))}
+      </div>
       <button onClick={onReload}>Reload</button>
       {questions.map((question, index) => (
         <QuestionDisplay

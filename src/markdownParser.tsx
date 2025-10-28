@@ -90,6 +90,7 @@ export default function MarkdownParser({ text }: Props) {
               // </div>
             );
           },
+
           code(props) {
             const { children, className, node, ...rest } = props;
             const match = /language-(\w+)/.exec(className || "");

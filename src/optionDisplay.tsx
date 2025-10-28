@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import MarkdownParser from "./markdownParser";
 import { GeneratorOption } from "./types";
 
 type Props = {
@@ -38,25 +39,26 @@ export const OptionDisplay = ({ option, options, setOptions }: Props) => {
   }, [multiselectValuesSelected]);
 
   return (
-    <>
+    <div>
       {option.type === "checkbox" && (
         <>
           <input
             type="checkbox"
             id={option.id}
             name={option.id}
-            checked={options[option.id]}
+            checked={options[option.id] ?? option.defaultValue}
             onChange={(e) =>
               setOptions((prev) => {
                 return { ...prev, [option.id]: e.target.checked };
               })
             }
           />
-          <label>{option.label}</label>{" "}
+          <MarkdownParser text={option.label} />
         </>
       )}
       {option.type === "select" && (
         <>
+          <MarkdownParser text={option.label} />
           <select
             id={option.id}
             name={option.id}
@@ -68,13 +70,16 @@ export const OptionDisplay = ({ option, options, setOptions }: Props) => {
             }
           >
             {option.values!.map((el: any) => (
-              <option value={el}>{el}</option>
+              <option value={el}>
+                <MarkdownParser text={el} />
+              </option>
             ))}
           </select>{" "}
         </>
       )}
       {option.type === "multiselect" && (
         <>
+          <MarkdownParser text={option.label} />
           <select
             id={option.id}
             name={option.id}
@@ -88,12 +93,12 @@ export const OptionDisplay = ({ option, options, setOptions }: Props) => {
             {option.values!.map((el: string) => (
               <option value={el}>
                 {multiselectValuesSelected.includes(el) ? "☑" : ""}
-                {el}
+                <MarkdownParser text={el} />
               </option>
             ))}
           </select>
         </>
       )}
-    </>
+    </div>
   );
 };
