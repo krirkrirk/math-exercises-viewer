@@ -55,6 +55,7 @@ function App() {
   useEffect(() => {
     const url = new URL(window.location.href);
     const exoId = url.searchParams.get("exoId");
+    const exoIdentifiers = url.searchParams.get("identifiers");
     const exoOptions = url.searchParams.get("options");
     const qcm = url.searchParams.get("isQCM");
     const ggb = url.searchParams.get("isGGB");
@@ -70,40 +71,56 @@ function App() {
       return true;
     };
     if (exoId) {
-      if (ggb === "true") {
-        fetch(`http://localhost:5000/exo?exoId=${exoId}&options=${exoOptions}`)
-          .then((res) => res.json())
-          .then((res) => {
-            setSelectedExercise(res.exercise);
-            setQuestions(res.questions);
-
-            setNextExoId(res.nextId);
-            setPrevExoId(res.prevId);
-          })
-          .catch((err) => console.log(err));
-      } else if (qcm === "true") {
+      if (!!exoIdentifiers) {
         fetch(
-          `http://localhost:5000/qcmExo?exoId=${exoId}&options=${exoOptions}`
+          `http://localhost:5000/getQuestionFromIdentifiers?exoId=${exoId}&identifiers=${exoIdentifiers}&options=${exoOptions}`
         )
           .then((res) => res.json())
           .then((res) => {
             setSelectedExercise(res.exercise);
-            setQuestions(res.questions);
-            setNextExoId(res.nextId);
-            setPrevExoId(res.prevId);
+            setQuestions([res.question]);
           })
           .catch((err) => console.log(err));
       } else {
-        fetch(`http://localhost:5000/exo?exoId=${exoId}&options=${exoOptions}`)
-          .then((res) => res.json())
-          .then((res) => {
-            setSelectedExercise(res.exercise);
-            setQuestions(res.questions);
+        if (ggb === "true") {
+          fetch(
+            `http://localhost:5000/exo?exoId=${exoId}&options=${exoOptions}`
+          )
+            .then((res) => res.json())
+            .then((res) => {
+              setSelectedExercise(res.exercise);
+              setQuestions(res.questions);
 
-            setNextExoId(res.nextId);
-            setPrevExoId(res.prevId);
-          })
-          .catch((err) => console.log(err));
+              setNextExoId(res.nextId);
+              setPrevExoId(res.prevId);
+            })
+            .catch((err) => console.log(err));
+        } else if (qcm === "true") {
+          fetch(
+            `http://localhost:5000/qcmExo?exoId=${exoId}&options=${exoOptions}`
+          )
+            .then((res) => res.json())
+            .then((res) => {
+              setSelectedExercise(res.exercise);
+              setQuestions(res.questions);
+              setNextExoId(res.nextId);
+              setPrevExoId(res.prevId);
+            })
+            .catch((err) => console.log(err));
+        } else {
+          fetch(
+            `http://localhost:5000/exo?exoId=${exoId}&options=${exoOptions}`
+          )
+            .then((res) => res.json())
+            .then((res) => {
+              setSelectedExercise(res.exercise);
+              setQuestions(res.questions);
+
+              setNextExoId(res.nextId);
+              setPrevExoId(res.prevId);
+            })
+            .catch((err) => console.log(err));
+        }
       }
     } else {
       if (isMathlive) {
